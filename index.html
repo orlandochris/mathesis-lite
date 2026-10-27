@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mathesis Lite</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1d2433;--muted:#6b7385;--line:#e2e5ec;--accent:#1f6feb;--accent-t:#fff;--ok:#1a7f4b;--warn:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b2029;--text:#e8ebf2;--muted:#98a1b3;--line:#2b3240;--accent:#5b9bff;--accent-t:#0b1220;--ok:#4cc38a;--warn:#f0a35c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b2029;--text:#e8ebf2;--muted:#98a1b3;--line:#2b3240;--accent:#5b9bff;--accent-t:#0b1220;--ok:#4cc38a;--warn:#f0a35c;color-scheme:dark}
+:root[data-theme="gradient"]{--bg:#eef2fb;--bgi:linear-gradient(135deg,#dbeafe,#ede9fe 50%,#d1fae5);--card:rgba(255,255,255,.8);--text:#1d2433;--muted:#5b6478;--line:rgba(120,130,160,.28);--accent:#4f46e5;--accent-t:#fff;--ok:#1a7f4b;--warn:#b45309;color-scheme:light}
+body.hasbg main{background:color-mix(in srgb,var(--bg) var(--pa,85%),transparent);border-radius:14px;margin:10px}
+body.hasbg nav{background:color-mix(in srgb,var(--card) var(--pa,85%),transparent)}
+input[type=range]{width:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bgi,var(--bg));background-attachment:fixed;color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.45}
+main{max-width:940px;margin:0 auto;padding:18px 14px 40px}
+h1{font-size:1.5rem;margin:6px 0 2px}h2{font-size:1.05rem;margin:0 0 10px}
+.sub,.meta{color:var(--muted);font-size:.85rem}.sub{margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.course{border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--card)}
+.course.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.course b{display:block;font-size:.85rem}.course span{font-size:.8rem;color:var(--muted)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}
+textarea,select{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit;font-size:16px}
+button{font:inherit}
+.primary{background:var(--accent);color:var(--accent-t);border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:bold}
+.primary:disabled{opacity:.6}
+.link{background:none;border:0;color:var(--muted);cursor:pointer;font-size:.8rem;text-decoration:underline}
+.top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.big{flex:1;min-width:120px;text-align:center;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.big b{display:block;font-size:1.4rem}
+.wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+th:first-child,td:first-child,td:last-child,th:last-child{text-align:left}
+td:last-child{white-space:normal;min-width:140px}
+.charts{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin:16px 0}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem;margin-top:6px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.row{padding:8px 0;border-top:1px solid var(--line);display:flex;gap:10px}.row:first-child{border-top:0}
+@media(max-width:640px){.charts{grid-template-columns:1fr}}
+.shell{display:flex;min-height:100vh}
+nav{width:150px;flex:none;padding:18px 10px;border-right:1px solid var(--line);background:var(--card)}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:10px;color:var(--text);cursor:pointer;margin-bottom:4px;font-size:.95rem}
+nav button.on{background:var(--bg);font-weight:bold;box-shadow:inset 3px 0 0 var(--accent)}
+.shell main{flex:1;min-width:0;max-width:940px}
+@media(max-width:560px){nav{width:84px;padding:14px 6px}nav button{padding:10px 6px;font-size:.8rem}}
+.ic{font-size:1.25rem;line-height:1}
+nav button{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;transition:background .2s,transform .15s}
+nav button:hover{background:var(--bg);transform:translateX(3px)}
+nav .lb{font-size:.78rem}
+.nlogo{display:block;margin:0 auto 14px;animation:pulse 4s ease-in-out infinite}
+.pulse{animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes growy{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+main>div{animation:fadeUp .35s ease both}
+svg .g{transform-box:fill-box;transform-origin:left center;animation:growx .7s cubic-bezier(.2,.7,.2,1) both}
+svg .gv{transform-box:fill-box;transform-origin:center bottom;animation:growy .7s cubic-bezier(.2,.7,.2,1) both}
+.course{transition:transform .18s ease,box-shadow .18s ease,border-color .18s}
+.course:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,0,0,.15)}
+.course:active{transform:scale(.98)}
+.primary{transition:transform .15s,filter .15s}.primary:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.lst{margin:0;padding-left:20px}.lst li{margin-bottom:6px}
+@media (hover:hover) and (min-width:561px){
+ nav{width:64px;overflow:hidden;transition:width .25s ease;position:sticky;top:0;align-self:flex-start;height:100vh}
+ nav:hover,nav:focus-within{width:176px}
+ nav button{flex-direction:row;gap:12px;text-align:left}
+ nav .lb{font-size:.95rem;white-space:nowrap;opacity:0;transform:translateX(-6px);transition:opacity .2s .05s,transform .25s}
+ nav:hover .lb,nav:focus-within .lb{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#pv input{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit;font-size:16px}
+.pvg{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin:8px 0}
+#pv label{display:block;margin-top:8px}
+.sigw{display:flex;justify-content:center;padding:26px 0 8px}
+.sig{--g:url("data:image/png;base64,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");--d:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA3gAAAB+CAYAAAB237POAAAD/klEQVR42u3drXITUQCG4a8MLvHEN6YqeBSK+igUXACae+ACqqpQKHwugKqa4lOf+lQvYvcMSyY/ZSDM5vA8Mzud6VnTMxV5J+fnrGmaAAAAcPqemQIAAACBBwAAgMADAABA4AEAACDwAAAABB4AAAACDwAAAIEHAACAwAMAABB4AAAACDwAAAAEHgAAAAIPAAAAgQcAACDwAAAAEHgAAAAIPAAAAAQeAACAwAMAAEDgAQAAIPAAAAAQeAAAAAIPAAAAgQcAAIDAAwAAQOABAAAg8AAAAAQeAAAAAg8AAACBBwAAgMADAAAQeAAAAAg8AAAABB4AAAACDwAAQOABAAAg8AAAABB4AAAACDwAAAAEHgAAgMADAABA4AEAACDwAAAAEHgAAAACDwAAAIEHAACAwAMAAEDgAQAAIPAAAAAEHgAAAAIPAAAAgQcAAIDAAwAAqN9zUwAAAFTqPMm4e9bdcy/wAAAATss8yaskk17grZLcJPkq8AAAAIZvlOQyyZsk0y7wilUXe0mySPIo8AAAAIbrMsmsF3brjfFJN55U+E2ewAMAAGoxT/vNXT/u1lvee9l7p6rIE3gAAEANXqTdczdNuwxztSPuxvl1X963JA+1TIJrEgAAgBqU/XaTLUFXnr7y7rSmSRB4AABALcZHfl/gAQAA/CPrI78/ePbgAQAANVim3XfXvwphX8SVd5cCDwAAYFge0l5iXg5RSXYvwSxxd5OKDlgReL9nlOR92tN5vqfCOzMAAODElc/os7RXIWwerlKuTbir9TO9wHuaWZIvSS56v7tN8jbJvekBAIDBWHQ/ywmZm4G36uJuUeMff9Y0jX+B/UZdzF1sGbtN8jrJo2kCAIBBmae9F69/511ZllntajyBd9jHJJ/2jH9IcmWaAABgcM7zc5lmWZ5Z9Qo8SzQPO3Tx4cwUAQDAIP1326ncg3fY8g/HAQAABN5AXCW53jF2HcszAQCAgbAH7+nmSd6lPW71LsnnuCoBAAAQeCdtlvZYVQAAAIEHAADA32cPHgAAgMADAABA4AEAACDwAAAAEHgAAAACDwAAAIEHAACAwAMAAEDgAQAACDwAAAAEHgAAAAIPAAAAgQcAAIDAAwAAEHgAAAAIPAAAAAQeAAAAAg8AAEDgAQAAIPAAAAAQeAAAAAg8AAAAgQcAAIDAAwAAQOABAAAg8AAAABB4AAAAAg8AAACBBwAAgMADAABA4AEAAAg8AAAABB4AAAACDwAAAIEHAAAg8EwBAACAwAMAAEDgAQAAIPAAAAAQeAAAAAIPAAAAgQcAAIDAAwAAQOABAAAIPAAAAAQeAAAAAg8AAACBBwAAgMADAAAQeAAAAAg8AAAAjuQH+Q9bLrqMhDUAAAAASUVORK5CYII=");position:relative;display:block;width:296px;max-width:100%;aspect-ratio:888/126;min-height:42px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sig span{position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;transition:opacity .7s ease}
+.sig .sg{background:var(--text);-webkit-mask-image:var(--g);mask-image:var(--g);opacity:.4}
+.sig .sh{-webkit-mask-image:var(--g);mask-image:var(--g);background:linear-gradient(100deg,transparent 38%,#ffe08f 50%,transparent 62%);background-size:320% 100%;background-position:160% 0;opacity:0}
+.sig .sd{background:#c9923a;-webkit-mask-image:var(--d);mask-image:var(--d);opacity:.65}
+.sig:hover .sg,.sig:focus-visible .sg,.sig.lit .sg{opacity:1}
+.sig:hover .sd,.sig:focus-visible .sd,.sig.lit .sd{opacity:1}
+.sig:hover .sh,.sig:focus-visible .sh,.sig.lit .sh{animation:sweep 1.3s ease-in-out}
+@keyframes sweep{0%{opacity:1;background-position:160% 0}100%{opacity:1;background-position:-60% 0}}
+#tour{position:fixed;inset:0;z-index:50;background:rgba(8,10,16,.62);display:flex;align-items:center;justify-content:center;padding:16px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.tcard{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:18px;max-width:380px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.35);animation:fadeUp .35s ease both}
+.tcard h2{margin:0 0 4px}
+.tscene{position:relative;width:100%;max-width:340px;height:200px;margin:12px auto 0;border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+.tl{position:absolute;inset:0;padding:14px;opacity:0}
+.tl.st4{opacity:1}
+.st1{animation:s1 16s infinite}.st2{animation:s2 16s infinite}.st3{animation:s3 16s infinite}.st4{animation:s4 16s infinite}
+@keyframes s1{0%,22%{opacity:1}26%,100%{opacity:0}}
+@keyframes s2{0%,22%{opacity:0}26%,46%{opacity:1}50%,100%{opacity:0}}
+@keyframes s3{0%,46%{opacity:0}50%,70%{opacity:1}74%,100%{opacity:0}}
+@keyframes s4{0%,70%{opacity:0}74%,96%{opacity:1}100%{opacity:0}}
+.mc{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;background:var(--card);margin-bottom:8px}
+.mc span{color:var(--muted);margin-left:6px}
+.mc.hl{animation:hl 16s infinite}
+@keyframes hl{0%,12%{box-shadow:none}15%,100%{box-shadow:0 0 0 2px var(--accent) inset}}
+.mbox{height:100px;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:12px}
+.ln{display:block;height:6px;border-radius:3px;background:var(--muted);opacity:.5;margin-bottom:10px;transform-origin:left;animation:typ 16s infinite}
+.ln.l1{width:92%}.ln.l2{width:100%;animation-delay:.3s}.ln.l3{width:84%;animation-delay:.6s}.ln.l4{width:60%;animation-delay:.9s}
+@keyframes typ{0%,26%{transform:scaleX(0)}34%,100%{transform:scaleX(1)}}
+.mbtn,.mok{background:var(--accent);color:var(--accent-t);border-radius:8px;padding:8px 10px;font-size:12px;font-weight:bold;text-align:center}
+.mbtn{width:170px;margin:14px auto 0}
+.mpv{font-size:11px}.mpv b.t{display:block;font-size:12px;margin-bottom:8px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:3px 7px;margin:0 4px 5px 0;background:var(--card)}
+.mok{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:190px;animation:pulseb 16s infinite}
+@keyframes pulseb{0%,60%{filter:none}64%,70%{filter:brightness(1.25)}100%{filter:none}}
+.mr{display:flex;align-items:center;gap:8px;font-size:10px;margin-bottom:9px}
+.mr span{width:62px;color:var(--muted)}
+.mb{display:block;height:12px;border-radius:4px;background:var(--c);width:var(--w);transform-origin:left;animation:bgrow 16s infinite}
+@keyframes bgrow{0%,74%{transform:scaleX(0)}86%,100%{transform:scaleX(1)}}
+.mbars{width:58%}
+.mdn{position:absolute;right:14px;top:44px}
+.mtick{font-size:11px;color:var(--ok);margin-bottom:10px;font-weight:bold}
+.cur{position:absolute;left:0;top:0;width:16px;height:16px;border-radius:50%;background:#ffcf6a;border:2px solid #fff;box-shadow:0 0 0 4px rgba(255,200,90,.35);opacity:0;z-index:3;animation:cur 16s infinite}
+@keyframes cur{
+0%{transform:translate(30px,170px) scale(1);opacity:0}
+4%{transform:translate(60px,150px) scale(1);opacity:1}
+12%{transform:translate(152px,60px) scale(1)}
+15%{transform:translate(152px,60px) scale(.7)}
+18%{transform:translate(152px,60px) scale(1)}
+25%{transform:translate(152px,60px) scale(1);opacity:1}
+27%{transform:translate(152px,60px) scale(1);opacity:0}
+30%{transform:translate(200px,100px) scale(1);opacity:0}
+33%{transform:translate(200px,100px) scale(1);opacity:1}
+40%{transform:translate(162px,135px) scale(1)}
+43%{transform:translate(162px,135px) scale(.7)}
+46%{transform:translate(162px,135px) scale(1)}
+49%{transform:translate(162px,135px) scale(1);opacity:0}
+52%{transform:translate(220px,150px) scale(1);opacity:0}
+54%{transform:translate(220px,150px) scale(1);opacity:1}
+62%{transform:translate(160px,162px) scale(1)}
+65%{transform:translate(160px,162px) scale(.7)}
+68%{transform:translate(160px,162px) scale(1)}
+72%{transform:translate(160px,162px) scale(1);opacity:0}
+100%{transform:translate(160px,162px) scale(1);opacity:0}}
+.tcaps{position:relative;height:24px;margin-top:12px;text-align:center}
+.cp{position:absolute;inset:0;opacity:0;font-size:14px;font-weight:bold}
+.cp4{opacity:1}
+.cp1{animation:s1 16s infinite}.cp2{animation:s2 16s infinite}.cp3{animation:s3 16s infinite}.cp4{animation:s4 16s infinite}
+.tdots{display:flex;gap:6px;justify-content:center;margin-top:6px}
+.tdots i{width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.25}
+.tdots i.d4{opacity:1}
+.tdots i.d1{animation:d1 16s infinite}.tdots i.d2{animation:d2 16s infinite}.tdots i.d3{animation:d3 16s infinite}.tdots i.d4{animation:d4 16s infinite}
+@keyframes d1{0%,22%{opacity:1}26%,100%{opacity:.25}}
+@keyframes d2{0%,22%{opacity:.25}26%,46%{opacity:1}50%,100%{opacity:.25}}
+@keyframes d3{0%,46%{opacity:.25}50%,70%{opacity:1}74%,100%{opacity:.25}}
+@keyframes d4{0%,70%{opacity:.25}74%,96%{opacity:1}100%{opacity:.25}}
+.tbtn{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.fx{animation:textIn .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes textIn{from{opacity:0;transform:translateY(8px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+#agree{position:fixed;inset:0;z-index:60;background:rgba(8,10,16,.7);display:flex;align-items:center;justify-content:center;padding:16px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.legal{text-align:center;font-size:.8rem;color:var(--muted);padding:0 0 16px}
+.legal a{color:var(--muted)}
+.pcard{background:linear-gradient(160deg,var(--card),color-mix(in srgb,#c9923a 14%,var(--card)));border-color:#c9923a}
+.pc-top{display:flex;gap:16px;align-items:center}
+.pc-ava{width:96px;height:96px;border-radius:50%;overflow:hidden;flex:none;border:3px solid var(--accent);background:var(--bg)}
+.pc-ava svg,.pc-ava img{width:100%;height:100%;display:block;object-fit:cover}
+.pc-name{font-size:1.3rem;font-weight:bold}
+.pc-ovr{display:flex;align-items:baseline;gap:6px;margin-top:6px}
+.pc-ovr b{font-size:2.6rem;line-height:1;color:var(--accent)}
+.pc-ovr span{color:var(--muted);font-weight:bold}
+.pc-body{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;align-items:center}
+.ar{display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:2px}
+.ar .l{width:84px}
+.ar .bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.ar .bar i{display:block;height:100%;background:var(--accent);transform-origin:left;animation:growx .8s both}
+.ar b{width:28px;text-align:right}
+.artip{font-size:.72rem;color:var(--muted);margin:0 0 8px 92px}
+.pach{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.ach{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;font-size:.8rem;background:var(--bg);opacity:.5;filter:grayscale(1)}
+.ach.on{opacity:1;filter:none;border-color:#c9923a;box-shadow:0 0 0 1px #c9923a inset}
+.ach .ai{font-size:1.6rem;display:block}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:8px 0}
+.pgrid button{border:2px solid var(--line);border-radius:50%;padding:0;background:none;cursor:pointer;width:64px;height:64px;overflow:hidden;transition:transform .15s}
+.pgrid button:hover{transform:scale(1.08)}
+.pgrid button.sel{border-color:var(--accent)}
+.pgrid svg{width:100%;height:100%;display:block}
+.av2{display:inline-block;text-align:center;margin:8px 10px 0 0}
+.av2 img{width:96px;height:96px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 6px}
+#v-pf input[type=text],#v-pf input[type=number],#v-pf select{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit;font-size:16px}
+.pjf{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.pjf .full{grid-column:1/-1}
+@media(max-width:560px){.pc-body,.pjf{grid-template-columns:1fr}}
+.cm td,.cm th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap;font-size:.85rem}
+.cm th:nth-child(2),.cm td:nth-child(2){text-align:left}
+.cm tr.me{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.mini{display:inline-block;width:30px;height:30px;border-radius:50%;overflow:hidden;vertical-align:middle;margin-right:8px;background:var(--bg)}
+.mini svg{width:100%;height:100%;display:block}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.seg button{background:none;border:0;padding:6px 12px;color:var(--text);cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--accent-t);font-weight:bold}
+.pjv label{display:block;margin-top:8px}
+#v-pj input[type=text],#v-pj input[type=number],#v-pj select,#v-pj textarea,#pjpv input,#pjpv textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit;font-size:16px}
+#v-pj textarea{resize:vertical}
+.pjg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+@media(max-width:560px){.pjg{grid-template-columns:1fr}}
+#lglo{position:fixed;inset:0;z-index:70;background:rgba(8,10,16,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+#lglo .tcard{max-width:560px;max-height:86vh;overflow:auto}
+#lglb h2{margin:0 0 4px}#lglb h3{font-size:1rem;margin:14px 0 4px}#lglb p,#lglb li{font-size:.9rem}
+</style>
+</head>
+<body>
+<div id="boot" style="display:block;padding:12px 14px;background:#fff4d6;color:#5b3d00;border-bottom:2px solid #c9923a;font:14px Arial,sans-serif;position:relative;z-index:80">Loading Mathesis… If this message stays and nothing responds, your viewer is blocking scripts or your browser is too old. Please open this file in the latest Chrome, Edge, Safari, or Firefox (not inside WhatsApp, email, or a file previewer).</div>
+<noscript><div style="padding:12px 14px;background:#fde2e2;color:#7a1f1f;font:14px Arial,sans-serif">JavaScript is turned off, so Mathesis cannot run. Please turn it on, or open this file in Chrome, Edge, Safari, or Firefox.</div></noscript>
+<script>window.addEventListener("error",function(e){var b=document.getElementById("boot");if(b){b.style.display="block";b.innerHTML="Something stopped Mathesis from starting: "+(e&&e.message?e.message:"unknown error")+". Please open this file in the latest Chrome, Edge, Safari, or Firefox."}});</script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f46e5"/><stop offset=".55" stop-color="#1f6feb"/><stop offset="1" stop-color="#0ea5a4"/></linearGradient></defs><symbol id="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="url(#lg)"/><rect x="15" y="11" width="34" height="42" rx="5" fill="#fff" opacity=".95"/><g fill="#4f46e5"><circle cx="15" cy="20" r="2.4"/><circle cx="15" cy="29" r="2.4"/><circle cx="15" cy="38" r="2.4"/><circle cx="15" cy="47" r="2.4"/><rect x="23" y="36" width="6" height="11" rx="1.5"/><rect x="31" y="29" width="6" height="18" rx="1.5"/><rect x="39" y="20" width="6" height="27" rx="1.5"/></g></symbol></svg>
+<div id="agree" hidden role="dialog" aria-label="Terms and privacy"><div class="tcard">
+<h2>Before you start</h2>
+<p class="meta" style="margin:0 0 10px">Mathesis keeps your study records private to you. Please read how it handles your data.</p>
+<p><a href="#" data-legal="privacy">Privacy Policy</a> &middot; <a href="#" data-legal="terms">Terms of Service</a></p>
+<label style="display:flex;gap:10px;align-items:flex-start;margin:12px 0"><input type="checkbox" id="agk" style="width:20px;height:20px;flex:none"><span>I have read and agree to the Terms of Service and the Privacy Policy.</span></label>
+<div class="tbtn"><span class="meta" id="agm"></span><button class="primary" id="agb" type="button" disabled>Continue</button></div>
+</div></div>
+<div id="tour" hidden role="dialog" aria-label="How Mathesis works"><div class="tcard">
+<h2>How Mathesis works</h2>
+<p class="meta" style="margin:0">A short example of one study week. None of this is your data.</p>
+<div class="tscene" aria-hidden="true">
+ <div class="tl st1"><div class="mc"><b>BCHEM 353</b><span>Metabolism</span></div><div class="mc hl"><b>BCHEM 355</b><span>Analytical Biochemistry</span></div><div class="mc"><b>STAT 153</b><span>Statistics</span></div></div>
+ <div class="tl st2"><div class="mbox"><i class="ln l1"></i><i class="ln l2"></i><i class="ln l3"></i><i class="ln l4"></i></div><div class="mbtn">Generate analytics</div></div>
+ <div class="tl st3"><div class="mpv"><b class="t">Check, then save to see your graphs</b><span class="chip">Quizzes <b>2</b></span><span class="chip">Audio <b>3</b></span><span class="chip">Video <b>1</b></span><span class="chip">Flashcards <b>1</b></span><div class="meta" style="margin-top:4px">Struggled with: glycogen branching</div></div><div class="mok">Save and show my graphs</div></div>
+ <div class="tl st4"><div class="mtick">&#10003; Report saved. Your week:</div><div class="mbars"><div class="mr"><span>BCHEM 353</span><i class="mb" style="--w:70%;--c:#1f6feb"></i></div><div class="mr"><span>BCHEM 355</span><i class="mb" style="--w:100%;--c:#8957e5"></i></div><div class="mr"><span>BCHEM 357</span><i class="mb" style="--w:45%;--c:#2da44e"></i></div><div class="mr"><span>STAT 153</span><i class="mb" style="--w:60%;--c:#d29922"></i></div></div>
+  <svg class="mdn" viewBox="0 0 80 80" width="70" height="70"><g transform="rotate(-90 40 40)"><circle cx="40" cy="40" r="26" fill="none" stroke="#1f6feb" stroke-width="14" stroke-dasharray="60 103.4"/><circle cx="40" cy="40" r="26" fill="none" stroke="#8957e5" stroke-width="14" stroke-dasharray="40 123.4" stroke-dashoffset="-60"/><circle cx="40" cy="40" r="26" fill="none" stroke="#2da44e" stroke-width="14" stroke-dasharray="30 133.4" stroke-dashoffset="-100"/><circle cx="40" cy="40" r="26" fill="none" stroke="#d29922" stroke-width="14" stroke-dasharray="33.4 130" stroke-dashoffset="-130"/></g></svg></div>
+ <div class="cur"></div>
+</div>
+<div class="tcaps"><span class="cp cp1">1. Tap a course</span><span class="cp cp2">2. Paste its weekly report</span><span class="cp cp3">3. Check what it read, then save</span><span class="cp cp4">4. Your graphs appear</span></div>
+<div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i><i class="d4"></i></div>
+<div class="tbtn"><button class="link" id="t-skip" type="button">Skip</button><button class="primary" id="t-go" type="button">Got it, start</button></div>
+</div></div>
+<div id="lglo" hidden role="dialog" aria-label="Legal"><div class="tcard"><div id="lglb"></div><p style="margin:14px 0 0"><button class="primary" id="lglx" type="button">Close</button></p></div></div>
+<div class="shell"><nav id="nav"><svg class="nlogo" width="40" height="40"><use href="#logo"/></svg><button data-v="home"><span class="ic">🏠</span><span class="lb">Home</span></button><button data-v="week" class="on"><span class="ic">📅</span><span class="lb">Weekly</span></button><button data-v="lib"><span class="ic">📚</span><span class="lb">Library</span></button><button data-v="rev"><span class="ic">🔁</span><span class="lb">Revision</span></button><button data-v="pf"><span class="ic">🏅</span><span class="lb">Profile</span></button><button data-v="pj"><span class="ic">🚀</span><span class="lb">Projects</span></button><button data-v="cu"><span class="ic">🎨</span><span class="lb">Customize</span></button></nav>
+<main>
+<div id="v-home" hidden>
+<div style="text-align:center;padding:10px 0 4px"><svg class="pulse" width="84" height="84"><use href="#logo"/></svg>
+<h1 style="font-size:1.8rem">Mathesis</h1>
+<p class="meta" style="margin:0 0 4px">Mathesis (μάθησις) is Greek for “learning”.</p>
+<p class="sub">Your weekly study record, built from your Notebook sessions.</p></div>
+<div class="card"><h2>What it does</h2><ul class="lst"><li>Takes the weekly report from each course’s Notebook and counts it for you, then lets you check it.</li><li>Turns it into charts and tables: what you did, how you scored, and what you struggled with.</li><li>Gathers the topics you struggled with into a revision list you can tick off.</li><li>Keeps every week on your own device, so each semester becomes a record you can look back on and download.</li></ul></div>
+<div class="card"><h2>What it aims to do</h2><p style="margin:0">To make studying something you can see and steer. You see where your time went, which courses need attention, and what to revise next, and you finish every semester with a complete record instead of a blur.</p></div>
+<div class="card"><h2>How to use it</h2><ol class="lst"><li>Open this file in your browser (Chrome, Edge, Safari, or Firefox), not inside a chat app, so your data is remembered on this device.</li><li>First time? Open <b>Customize</b> and type in your own courses.</li><li>At the end of the week, get a report from each course’s Notebook.</li><li>Open <b>Weekly</b>, tap the course, paste the report, and press Generate.</li><li>Check <b>Revision</b> for what to study next, and <b>Library</b> to look back.</li></ol></div>
+<p style="text-align:center"><button class="primary" id="hs" type="button">Start your week</button></p>
+<p style="text-align:center"><button class="link" id="tourbtn" type="button">Watch how it works</button></p>
+<p style="text-align:center"><label class="meta"><input type="checkbox" id="skiph"> Skip this page next time</label></p>
+</div>
+<div id="v-week">
+<div style="display:flex;justify-content:space-between;align-items:center"><h1>Mathesis</h1><button class="link" id="rl" type="button">Reload</button></div>
+<p class="sub">Once a week: tap a course, paste its Notebook report, and your analytics update by themselves.</p>
+<div style="max-width:260px;margin-bottom:12px"><label class="meta" for="wk">Week</label><select id="wk"></select></div>
+<div style="max-width:260px;margin-bottom:12px"><label class="meta" for="sem">Semester (saved with each report)</label><input id="sem" type="text" value="Semester 1" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit;font-size:16px"></div>
+
+<div class="card"><h2>1. Pick a course</h2><div class="grid" id="courses"></div></div>
+
+<div class="card" id="sub" hidden>
+  <h2 id="subT">2. Paste the report</h2>
+  <textarea id="rep" rows="7" placeholder="Paste the weekly report from this course’s Notebook here. Any format is fine."></textarea>
+  <details style="margin:8px 0"><summary class="meta" style="cursor:pointer">What should I ask my Notebook or Gemini for?</summary>
+    <textarea id="ask" rows="3" readonly style="margin-top:6px"></textarea></details>
+  <div style="max-width:260px;margin:10px 0"><label class="meta" for="cs2">Chart style (pick before you generate)</label><select id="cs2" data-cs></select></div>
+  <button class="primary" id="go" type="button">Generate analytics</button> <span class="meta" id="msg"></span>
+  <div id="pv" hidden style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px"></div>
+</div>
+
+<div class="card" id="an"></div>
+
+<div class="card"><h2>Submissions this week</h2><div id="hist"></div><p class="meta" id="store"></p><p class="meta warn" id="toast"></p></div>
+</div>
+<div id="v-lib" hidden>
+<div style="display:flex;justify-content:space-between;align-items:center"><h1>Library</h1><span><button class="link" id="dlb" type="button">Download semester (CSV)</button> <button class="link" id="lr" type="button">Refresh library</button></span></div>
+<p class="sub">Your saved records, by semester.</p>
+<div style="max-width:300px;margin-bottom:12px"><label class="meta" for="ls">Semester</label><select id="ls"></select></div>
+<div style="max-width:300px;margin-bottom:12px"><label class="meta" for="cs3">Chart style</label><select id="cs3" data-cs></select></div>
+<p class="meta warn" id="dlm"></p>
+<div id="lb"><p class="meta">Open this page to load your records.</p></div>
+</div>
+<div id="v-rev" hidden>
+<div style="display:flex;justify-content:space-between;align-items:center"><h1>Revision list</h1><button class="link" id="rr" type="button">Refresh</button></div>
+<p class="sub">Topics you struggled with, gathered from all your saved reports. Tick a topic when you have revised it.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><div style="flex:1;min-width:150px"><label class="meta" for="rs">Semester</label><select id="rs"></select></div><div style="flex:1;min-width:150px"><label class="meta" for="rc">Course</label><select id="rc"></select></div></div>
+<div class="card" id="rv"><p class="meta">Open this page to load your topics.</p></div>
+</div>
+<div id="v-pf" hidden>
+<h1>Profile</h1>
+<p class="sub">Your study profile, built from your own reports. It updates as you use the app.</p>
+<div class="card pcard" id="pcard"></div>
+<div class="card"><h2>Summary</h2><p id="pdesc" class="meta" style="margin:0 0 6px"></p><p style="margin:0"><button class="primary" id="pdb" type="button">Write my summary</button> <span class="meta" id="pdm"></span></p></div>
+<div class="card"><h2>Achievements <span class="meta" id="pacn"></span></h2><div class="pach" id="pach"></div></div>
+<div class="card"><h2>Personal projects</h2><p class="meta" style="margin:0 0 8px">Log project sessions and write project reports on the Projects page. They count toward your Initiative rating and have their own analytics.</p><button class="primary" id="gopj" type="button">Open Projects</button></div>
+<div class="card"><h2>Name and avatar</h2>
+<label class="meta" for="pname">Display name</label><input type="text" id="pname" maxlength="30" placeholder="Student">
+<p class="meta" style="margin:12px 0 0">Pick an avatar</p><div class="pgrid" id="pgrid"></div>
+<p class="meta" style="margin:4px 0 6px">Or use your own picture: a photo or a wallpaper. You can keep it as it is or turn it into a cartoon-style version.</p>
+<input type="file" id="pavf" accept="image/*"> <span class="meta" id="pavm"></span>
+<div id="pavc"></div>
+<p style="margin:10px 0 0"><button class="link" id="pdef" type="button">Go back to the default avatar</button></p></div>
+<details class="card"><summary style="cursor:pointer;font-weight:bold">How these numbers are worked out</summary>
+<ul class="lst" style="margin-top:10px"><li><b>Consistency:</b> how many of the last 8 weeks have a report.</li><li><b>Coverage:</b> how many of your courses had a report in the last 4 weeks.</li><li><b>Quiz form:</b> your average quiz score over the last 8 weeks.</li><li><b>Practice:</b> things done in the last 4 weeks, where 40 is the top score.</li><li><b>Revision:</b> the share of your struggled-with topics that you have ticked as revised.</li><li><b>Initiative:</b> personal project hours in the last 8 weeks, where 10 hours is the top score. It only counts once you log a session.</li></ul>
+<p class="meta">OVR is the average of the ratings that have data. A rating shows "-" until there is something to measure. The level label stays at "New profile" until you have reports in at least 2 weeks. These numbers describe your habits in this app. They are not grades.</p></details>
+</div>
+<div id="v-cm" hidden>
+<h1>Community</h1>
+<p class="sub">See who else is using Mathesis. Joining is optional.</p>
+<div class="card"><h2>Your place on the board</h2>
+<p class="meta" id="cmstat" style="margin:0 0 8px"></p>
+<p style="margin:0 0 8px"><button class="primary" id="cmjoin" type="button">Join the community board</button> <span class="meta" id="cmm"></span></p>
+<details><summary class="meta" style="cursor:pointer">What gets shared if you join</summary>
+<ul class="lst" style="margin-top:8px"><li>Your display name and your avatar choice (a built-in avatar or the default, never your own picture).</li><li>Which days you opened the app in the last 30 days.</li><li>How many reports you saved each week (just the number).</li><li>Your streak and the time you were last active.</li></ul>
+<p class="meta">Never shared: your reports, scores, topics, courses, project sessions, or description. Leaving the board deletes your numbers from it. Other members and the app’s owner can see what is listed here.</p></details></div>
+<div class="card"><h2>Leaderboard</h2>
+<div class="seg" id="cmseg"><button class="on" data-per="week" type="button">This week</button><button data-per="month" type="button">Last 30 days</button></div>
+<div class="wrap cm"><table><thead><tr><th>#</th><th>Member</th><th>Days active</th><th>Reports</th><th>Streak</th><th>Last active</th><th>Points</th></tr></thead><tbody id="cmlist"></tbody></table></div>
+<p class="meta" style="margin:8px 0 0">Points = 10 for every day you were active + 15 for every report you saved in the period. It rewards showing up, not scoring high.</p></div>
+<div class="card" id="cminv" hidden><h2>Inviting friends (owner only)</h2>
+<ol class="lst"><li>Open this app’s <b>Share</b> menu in Claude.</li><li>Add each friend by email and give them the <b>Contributor</b> role. Contributors can use the app, save their own data, and join the board.</li><li>Ask them to open the app, accept the agree screen, and press <b>Join the community board</b> here.</li></ol>
+<p class="meta">A plain link without an invitation usually gives outside visitors view-only access, which cannot save data or join. I could not test the exact wording of the Share menu, so check what it offers.</p></div>
+</div>
+<div id="v-pj" hidden>
+<h1>Projects</h1>
+<p class="sub">Your personal projects, tracked on their own. Nothing here depends on your course reports.</p>
+<div class="card"><h2>Log a project session</h2>
+<div class="pjg"><div><label class="meta" for="pjt">Project</label><input type="text" id="pjt" list="pjdl" maxlength="80" placeholder="e.g. Enzyme kinetics simulation"><datalist id="pjdl"></datalist></div>
+<div><label class="meta" for="pjh">Hours</label><input type="number" id="pjh" min="0" max="24" step="0.25" placeholder="1.5"></div>
+<div><label class="meta" for="pjc">Course (optional)</label><select id="pjc"></select></div></div>
+<label class="meta" for="pjr" style="display:block;margin-top:10px">Your report</label>
+<textarea id="pjr" rows="9" maxlength="8000" placeholder="Write as much as you like: what you did, what you learned, the setbacks you hit, what improved, and the skills you built or sharpened, including any way you feel you grew."></textarea>
+<div class="meta" style="text-align:right"><span id="pjcount">0</span> / 8000 characters</div>
+<p style="margin:8px 0 0"><button class="primary" id="pjread" type="button">Add details and save</button> <button class="link" id="pjquick" type="button">Save without reading</button> <span class="meta" id="pjm"></span></p>
+<div id="pjpv" hidden style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px"></div></div>
+<div class="card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h2 style="margin:0">Analytics</h2><select id="pjflt" style="width:auto"></select></div><div id="pjan" style="margin-top:10px"></div></div>
+<div class="card"><h2>Sessions</h2><div id="pjlist"></div></div>
+</div>
+<div id="v-cu" hidden>
+<h1>Customize</h1>
+<p class="sub">Make the app look the way you like. These choices are saved on this device.</p>
+<div class="card"><h2>Theme</h2><select id="th"><option value="auto">Auto (follows your phone)</option><option value="light">Light</option><option value="dark">Dark</option><option value="gradient">Soft gradient</option></select></div>
+<div class="card"><h2>Chart style</h2><select data-cs></select></div>
+<div class="card"><h2>Your courses</h2><p class="meta">One per line, like “BIO 101 - Introduction to Biology”. Removing a course only hides it here. Reports already saved stay in your library.</p><textarea id="cl" rows="8"></textarea><p><button class="primary" id="cs-save" type="button">Save courses</button> <span class="meta" id="cm2"></span></p></div>
+<div class="card"><h2>Background image</h2>
+<p class="meta">Pick a photo from your device. It is shrunk to fit and kept only on this device.</p>
+<input type="file" id="bgf" accept="image/*" style="margin:6px 0 12px">
+<label class="meta" for="bgd">Darken the image</label><input type="range" id="bgd" min="0" max="70">
+<label class="meta" for="bgp" style="margin-top:10px;display:block">Panel strength (lower shows more of your image)</label><input type="range" id="bgp" min="30" max="100">
+<p><button class="link" id="bgx" type="button">Remove image</button> <span class="meta" id="bgm"></span></p></div>
+</div>
+<div class="sigw"><div class="sig" id="sig" tabindex="0" role="img" aria-label="From the Alchemist"><span class="sg"></span><span class="sh"></span><span class="sd"></span></div></div>
+<div class="legal"><a href="#" data-legal="terms">Terms of Service</a> &middot; <a href="#" data-legal="privacy">Privacy Policy</a></div>
+</main></div>
+<script>
+document.getElementById("boot").style.display="none";
+let COURSES=[["COURSE 1","My first course"],["COURSE 2","My second course"]];
+const TYPES=[["quiz","Quizzes","#1f6feb"],["audio","Audio","#8957e5"],["video","Video","#d29922"],["flash","Flashcards","#2da44e"],["other","Other","#8b949e"]];
+const ASK="Write my study report for this week: list what I did here (quizzes with my scores, audio overviews, video overviews, flashcards), the topics I covered, and the topics I struggled with.";
+const PROMPT=`You read a student's weekly study report about one NotebookLM notebook. Reply with ONLY JSON, no other text: {"counts":{"quiz":0,"audio":0,"video":0,"flash":0,"other":0},"scores":[{"got":0,"out":0}],"topics":["..."],"weak":["..."],"summary":"..."}. counts are how many of each item the report says the student did (fold mind maps, study guides and anything else into other). scores are quiz scores stated in the report. topics: up to 8 topics covered. weak: up to 4 topics the student struggled with. summary: at most 20 words. Use only what the report says. Use 0 or empty lists when not mentioned. Never guess.`;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function monday(d){d=new Date(d);d.setDate(d.getDate()-(d.getDay()+6)%7);return iso(d)}
+const lab=w=>new Date(w+"T00:00").toLocaleDateString(undefined,{day:"numeric",month:"short"});
+const weeks=[...Array(8)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-7*i);return monday(d)});
+let reps=[],sel=null,week=weeks[0],backend="local",col=null,smp=null,mcp=null,armed=null;
+function toast(t){const e=document.getElementById("toast");if(e)e.textContent=t}
+const uid=()=>crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:r&3|8).toString(16)});
+
+function lsRead(){try{return JSON.parse(localStorage.getItem("nst-reports")||"[]")}catch(e){return[]}}
+function lsWrite(){try{localStorage.setItem("nst-reports",JSON.stringify(reps))}catch(e){}}
+async function init(){
+  $("ask").value=ASK;
+  $("wk").innerHTML=weeks.map((w,i)=>`<option value="${w}">Week of ${lab(w)}${i?"":" (this week)"}</option>`).join("");
+  try{const db=await claude.use("db"),u=await claude.use("user");
+    if(db&&u){const id=await u.id();ME=id;CANW=await u.can("data.write");boardInit(db,u);if(id&&CANW!==false){col=db.collection("data/users/"+id+"/reports");backend="db";revCol=db.collection("data/users/"+id+"/revised");revCol.orderBy("ts","desc").onSnapshot(s=>{REV={};s.docs.forEach(d=>{if(d.data().done)REV[d.id]=1});revRender()},()=>{});setCol=db.collection("data/users/"+id+"/settings");setCol.orderBy("ts","desc").onSnapshot(s=>{const d=s.docs.find(x=>x.id==="courses"),l=d&&d.data().list;if(Array.isArray(l)&&l.length)applyCourses(l);const pf=s.docs.find(x=>x.id==="profile");if(pf){PROF={...PROF,...pf.data()};profRender()}},()=>{});projCol=db.collection("data/users/"+id+"/projects");projCol.orderBy("ts","desc").onSnapshot(s=>{PROJ=s.docs.map(d=>({id:d.id,...d.data()}));profRender()},()=>{});
+      col.orderBy("ts","desc").onSnapshot(s=>{reps=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>{})}}}catch(e){}
+  if(backend!=="db"){if(CANW===false)toast("You have view-only access, so your reports are saved on this device only. Ask the owner to make you a member (Contributor) to keep them on your account.");reps=lsRead();try{REV=JSON.parse(localStorage.getItem("nst-rev")||"{}")}catch(e){}
+    try{const cl=JSON.parse(localStorage.getItem("nst-courses")||"null");if(Array.isArray(cl)&&cl.length){COURSES=cl;$("cl").value=cl.map(c=>c[0]+" - "+c[1]).join("\n")}}catch(e){}
+    try{const pf=JSON.parse(localStorage.getItem("nst-profile")||"null");if(pf)PROF={...PROF,...pf};PROJ=JSON.parse(localStorage.getItem("nst-proj")||"[]")}catch(e){}}
+  render();
+}
+function basic(t){const l=t.toLowerCase(),W={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
+  const cnt=re=>{const r1=new RegExp("\\b(\\d+|one|two|three|four|five|six|seven|eight|nine|ten)\\s+(?:[a-z-]+\\s+){0,2}?(?:"+re+")","g");let tot=0,found=false,m;while((m=r1.exec(l))){tot+=/^\d+$/.test(m[1])?+m[1]:W[m[1]];found=true}return found?tot:(l.match(new RegExp(re,"g"))||[]).length};
+  return{counts:{quiz:cnt("quiz(?:zes)?"),audio:cnt("audio"),video:cnt("video"),flash:cnt("flash ?cards?"),other:cnt("mind maps?|study guides?")},
+  scores:[...t.matchAll(/(\d+)\s*\/\s*(\d+)/g)].map(m=>({got:+m[1],out:+m[2]})).filter(s=>s.out>0&&s.got<=s.out),topics:[],weak:[],summary:""}}
+function clean(r){r=r||{};const c=r.counts||{},o={};TYPES.forEach(([k])=>o[k]=Math.max(0,Math.round(+c[k]||0)));
+  return{counts:o,scores:(Array.isArray(r.scores)?r.scores:[]).map(s=>({got:+s.got,out:+s.out})).filter(s=>s.out>0&&s.got>=0&&s.got<=s.out),
+  topics:(Array.isArray(r.topics)?r.topics:[]).map(String).slice(0,8),weak:(Array.isArray(r.weak)?r.weak:[]).map(String).slice(0,4),summary:String(r.summary||"").slice(0,200)}}
+
+function agg(w){return COURSES.map(([code,name])=>{const l=reps.filter(r=>r.week===w&&r.course===code);
+  const c={};TYPES.forEach(([k])=>c[k]=l.reduce((a,r)=>a+((r.counts||{})[k]||0),0));
+  const sc=l.flatMap(r=>r.scores||[]);
+  return{code,name,n:l.length,c,t:Object.values(c).reduce((a,b)=>a+b,0),pct:sc.length?Math.round(sc.reduce((a,s)=>a+s.got/s.out*100,0)/sc.length):null,weak:[...new Set(l.flatMap(r=>r.weak||[]))].slice(0,3)}})}
+
+function stackedBars(rows){const max=Math.max(1,...rows.map(r=>r.t)),W=640,L=80,H=rows.length*30+8;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Activities per course">`;
+  rows.forEach((r,i)=>{const y=i*30+4;s+=`<text x="0" y="${y+15}" font-size="12" fill="currentColor">${r.code}</text>`;let x=L;
+    TYPES.forEach(([k,,cl])=>{const w=(r.c[k]||0)/max*(W-L-30);if(w>0){s+=`<rect class="g" x="${x}" y="${y}" width="${w}" height="20" rx="3" fill="${cl}"/>`;x+=w}});
+    s+=`<text x="${x+6}" y="${y+15}" font-size="12" fill="currentColor">${r.t}</text>`});return s+"</svg>"}
+const CHARTS=[["stacked","Stacked bars"],["grouped","Grouped columns"],["line","Line"],["pie","Pie"],["donut","Donut"],["radar","Radar (spider web)"]];
+const PAL=["#1f6feb","#8957e5","#d29922","#2da44e","#e5534b","#0ea5a4","#db61a2","#8b949e","#6e7781","#bf8700"];
+let CHART=(()=>{try{const v=localStorage.getItem("nst-chart");return CHARTS.some(c=>c[0]===v)?v:"stacked"}catch(e){return"stacked"}})();
+const short=s=>String(s).replace(/^BCHEM /,"B");
+function chartOpts(){return CHARTS.map(c=>`<option value="${c[0]}" ${c[0]===CHART?"selected":""}>${c[1]}</option>`).join("")}
+function setChart(v){CHART=v;try{localStorage.setItem("nst-chart",v)}catch(e){}document.querySelectorAll("[data-cs]").forEach(s=>s.value=v);render();if(LR)libRender()}
+function mkRow(code,l,get){const c={};TYPES.forEach(([k])=>c[k]=l.reduce((a,r)=>a+((get(r)||{})[k]||0),0));return{code,c,t:Object.values(c).reduce((a,x)=>a+x,0)}}
+function weekRows(ctx){
+  if(ctx==="w")return weeks.slice().reverse().map(w=>mkRow(lab(w),reps.filter(r=>r.week===w),r=>r.counts));
+  const S=(LR||[]).filter(r=>r.semester===$("ls").value);return[...new Set(S.map(r=>r.week_start))].sort().map(w=>mkRow(lab(w),S.filter(r=>r.week_start===w),r=>r))}
+function bars(rows,ctx){
+  if(CHART==="line"&&ctx)rows=weekRows(ctx);
+  const n=rows.length,W=640;if(!n||rows.every(r=>!r.t)||CHART==="stacked")return stackedBars(rows);
+  const mx=Math.max(1,...rows.flatMap(r=>TYPES.map(([k])=>r.c[k]||0))),H=210,L=30,B=26;
+  const grid=()=>[0,.5,1].map(f=>{const y=H-B-f*(H-B-14);return `<line x1="${L}" x2="${W-6}" y1="${y}" y2="${y}" stroke="currentColor" opacity=".15"/><text x="${L-4}" y="${y+3}" text-anchor="end" font-size="9" fill="currentColor">${Math.round(mx*f)}</text>`}).join("");
+  const head=(l)=>`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${l}">`;
+  if(CHART==="grouped"){const gw=(W-L-10)/n,bw=Math.min(18,gw*.8/TYPES.length);let s=head("Grouped columns")+grid();
+    rows.forEach((r,i)=>{const x0=L+i*gw+(gw-bw*TYPES.length)/2;TYPES.forEach(([k,,cl],j)=>{const h=(r.c[k]||0)/mx*(H-B-14);if(h>0)s+=`<rect class="gv" x="${x0+j*bw}" y="${H-B-h}" width="${bw-1}" height="${h}" rx="2" fill="${cl}"/>`});
+      s+=`<text x="${L+i*gw+gw/2}" y="${H-8}" text-anchor="middle" font-size="9" fill="currentColor">${esc(short(r.code))}</text>`});return s+"</svg>"}
+  if(CHART==="line"){const X=i=>L+(n===1?(W-L-10)/2:i*(W-L-20)/(n-1)),Y=v=>H-B-v/mx*(H-B-14);let s=head("Line chart")+grid();
+    TYPES.forEach(([k,,cl])=>{s+=`<polyline fill="none" stroke="${cl}" stroke-width="2" points="${rows.map((r,i)=>X(i)+","+Y(r.c[k]||0)).join(" ")}"/>`+rows.map((r,i)=>`<circle cx="${X(i)}" cy="${Y(r.c[k]||0)}" r="3" fill="${cl}"/>`).join("")});
+    rows.forEach((r,i)=>s+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="9" fill="currentColor">${esc(short(r.code))}</text>`);return s+"</svg>"}
+  if(CHART==="pie"||CHART==="donut"){const tot=rows.reduce((a,r)=>a+r.t,0),act=rows.map((r,i)=>({r,i,v:r.t})).filter(x=>x.v>0),HH=Math.max(170,n*18+16),col=x=>PAL[x.i%PAL.length];
+    let s=`<svg viewBox="0 0 400 ${HH}" width="100%" role="img" aria-label="Share of activity"><g transform="translate(85 85)">`;
+    if(CHART==="pie"){let a0=-Math.PI/2;act.forEach(x=>{const a1=a0+x.v/tot*2*Math.PI;
+      if(act.length===1)s+=`<circle r="75" fill="${col(x)}"/>`;
+      else{const p=a=>[75*Math.cos(a),75*Math.sin(a)],P0=p(a0),P1=p(a1);s+=`<path d="M0 0L${P0[0]} ${P0[1]}A75 75 0 ${a1-a0>Math.PI?1:0} 1 ${P1[0]} ${P1[1]}Z" fill="${col(x)}"/>`}a0=a1})}
+    else{const C=2*Math.PI*52;let off=0;act.forEach(x=>{const len=x.v/tot*C;s+=`<circle r="52" fill="none" stroke="${col(x)}" stroke-width="30" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90)"/>`;off+=len});
+      s+=`<text y="6" text-anchor="middle" font-size="18" font-weight="bold" fill="currentColor">${tot}</text>`}
+    s+="</g>";rows.forEach((r,i)=>{const y=18+i*18;s+=`<rect x="190" y="${y-9}" width="10" height="10" rx="2" fill="${PAL[i%PAL.length]}"/><text x="206" y="${y}" font-size="11" fill="currentColor">${esc(r.code)} (${r.t})</text>`});return s+"</svg>"}
+  if(CHART==="radar"){if(n<3)return stackedBars(rows);const cx=180,cy=140,R=100,P=(i,f)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+R*f*Math.cos(a),cy+R*f*Math.sin(a)]};
+    let s=`<svg viewBox="0 0 360 280" width="100%" style="max-width:420px" role="img" aria-label="Radar chart">`;
+    [.33,.66,1].forEach(f=>s+=`<polygon points="${rows.map((_,i)=>P(i,f).join(",")).join(" ")}" fill="none" stroke="currentColor" opacity=".15"/>`);
+    rows.forEach((r,i)=>{const[x,y]=P(i,1),[lx,ly]=P(i,1.14);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="currentColor" opacity=".15"/><text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" fill="currentColor">${esc(short(r.code))}</text>`});
+    TYPES.forEach(([k,,cl])=>{s+=`<polygon points="${rows.map((r,i)=>P(i,(r.c[k]||0)/mx).join(",")).join(" ")}" fill="${cl}" fill-opacity=".15" stroke="${cl}" stroke-width="2"/>`});return s+"</svg>"}
+  return stackedBars(rows)}
+function donut(tot){const sum=TYPES.reduce((a,t)=>a+tot[t[0]],0);if(!sum)return"";let off=0;
+  let s=`<svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="Activity mix"><g transform="rotate(-90 60 60)">`;
+  TYPES.forEach(([k,,cl])=>{const len=tot[k]/sum*251.3;if(len>0){s+=`<circle cx="60" cy="60" r="40" fill="none" stroke="${cl}" stroke-width="22" stroke-dasharray="${len} ${251.3-len}" stroke-dashoffset="${-off}"/>`;off+=len}});
+  return s+`</g><text x="60" y="65" text-anchor="middle" font-size="16" font-weight="bold" fill="currentColor">${sum}</text></svg>`}
+function trend(){const ws=weeks.slice().reverse(),W=640,H=150,X=i=>40+i*(W-70)/(ws.length-1),Y=v=>H-25-v/100*(H-45);
+  const pts=ws.map(w=>{const sc=reps.filter(r=>r.week===w).flatMap(r=>r.scores||[]);return sc.length?Math.round(sc.reduce((a,s)=>a+s.got/s.out*100,0)/sc.length):null});
+  if(!pts.some(p=>p!==null))return`<p class="meta">Your quiz scores by week will appear here once your reports include scores.</p>`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Average quiz score by week">`;
+  [0,50,100].forEach(v=>s+=`<line x1="40" x2="${W-30}" y1="${Y(v)}" y2="${Y(v)}" stroke="currentColor" opacity=".15"/><text x="30" y="${Y(v)+4}" text-anchor="end" font-size="10" fill="currentColor">${v}%</text>`);
+  let d="";pts.forEach((p,i)=>{if(p!==null){d+=(d&&pts[i-1]!==null&&i>0?"L":"M")+X(i)+" "+Y(p)+" "}});
+  s+=`<path d="${d}" fill="none" stroke="#1f6feb" stroke-width="2"/>`;
+  pts.forEach((p,i)=>{s+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" font-size="10" fill="currentColor">${lab(ws[i])}</text>`;if(p!==null)s+=`<circle cx="${X(i)}" cy="${Y(p)}" r="4" fill="#1f6feb"/><text x="${X(i)}" y="${Y(p)-8}" text-anchor="middle" font-size="10" fill="currentColor">${p}%</text>`});
+  return s+"</svg>"}
+
+function render(){
+  $("wk").value=week;
+  const rows=agg(week),done=rows.filter(r=>r.n).length,tot={};TYPES.forEach(([k])=>tot[k]=rows.reduce((a,r)=>a+r.c[k],0));
+  const all=Object.values(tot).reduce((a,b)=>a+b,0),sc=reps.filter(r=>r.week===week).flatMap(r=>r.scores||[]);
+  const avg=sc.length?Math.round(sc.reduce((a,s)=>a+s.got/s.out*100,0)/sc.length)+"%":"-";
+  $("courses").innerHTML=rows.map(r=>`<div class="course ${sel===r.code?"sel":""}" data-c="${r.code}"><b>${r.code}</b><span>${esc(r.name)}</span>
+    <div class="meta ${r.n?"ok":""}" style="margin-top:4px">${r.n?"✓ Report submitted":"No report yet this week"}</div></div>`).join("");
+  $("an").innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px"><h2>Analytics: week of ${lab(week)}</h2><select data-cs style="width:auto">${chartOpts()}</select></div>
+   <div class="top"><div class="big"><b>${done}/${COURSES.length}</b><span class="meta">courses reported</span></div><div class="big"><b>${all}</b><span class="meta">things done</span></div><div class="big"><b>${avg}</b><span class="meta">average quiz score</span></div></div>`+
+   (all||done?`<div class="charts"><div><div class="meta">${CHART==="line"?"Activity over the last 8 weeks":"Activities per course"}</div>${bars(rows,"w")}</div><div><div class="meta">What you did</div>${donut(tot)}</div></div>
+   <div class="legend">${TYPES.map(([k,n,cl])=>`<span><i class="dot" style="background:${cl}"></i>${n}</span>`).join("")}</div>
+   <div class="wrap" style="margin-top:14px"><table><tr><th>Course</th><th>Report</th>${TYPES.map(t=>`<th>${t[1]}</th>`).join("")}<th>Avg quiz</th><th>Struggled with</th></tr>
+   ${rows.map(r=>`<tr><td>${r.code}</td><td class="${r.n?"ok":"warn"}">${r.n?"✓":"-"}</td>${TYPES.map(t=>`<td>${r.c[t[0]]}</td>`).join("")}<td>${r.pct===null?"-":r.pct+"%"}</td><td>${r.weak.length?esc(r.weak.join(", ")):"-"}</td></tr>`).join("")}</table></div>`
+   :`<p class="meta">Nothing submitted for this week yet. Tap a course above and paste its report.</p>`)+
+   `<div class="meta" style="margin-top:14px">Average quiz score over the last 8 weeks</div>${trend()}`;
+  const l=reps.filter(r=>r.week===week);
+  $("hist").innerHTML=l.length?l.map(r=>`<div class="row"><div style="flex:1"><b>${r.course}</b> <span class="meta">${new Date(r.ts).toLocaleDateString()}</span>
+    ${r.summary?`<div class="meta">${esc(r.summary)}</div>`:""}${(r.topics||[]).length?`<div class="meta">Topics: ${esc(r.topics.join(", "))}</div>`:""}</div>
+    <button class="link" data-del="${r.id}">${armed===r.id?"Tap again to confirm delete":"delete"}</button></div>`).join(""):`<p class="meta">No submissions for this week.</p>`;
+  $("store").textContent=backend==="db"?"Saved to your account, so it follows you across devices.":"Saved in this browser on this device only.";
+}
+document.addEventListener("click",async e=>{
+  const c=e.target.closest(".course");
+  if(c){sel=c.dataset.c;$("sub").hidden=false;const nm=COURSES.find(x=>x[0]===sel)[1];$("subT").textContent=`2. Paste the report for ${sel} - ${nm}`;$("msg").textContent="";render();$("rep").focus();return}
+  const d=e.target.dataset&&e.target.dataset.del;
+  if(d&&armed!==d){armed=d;toast("");render();setTimeout(()=>{if(armed===d){armed=null;render()}},4000);return}
+  if(d){armed=null;if(backend==="db"){try{await col.doc(d).delete()}catch(x){}}else{reps=reps.filter(r=>r.id!==d);lsWrite();render()}}
+});
+$("wk").addEventListener("change",()=>{week=$("wk").value;render()});
+$("go").addEventListener("click",async()=>{
+  const t=$("rep").value.trim(),msg=$("msg");if(!t){msg.textContent="Paste the report first.";return}
+  $("go").disabled=true;msg.textContent="Reading your report…";let r,mode="ai";
+  try{smp=smp||await claude.use("sample");if(!smp)throw 0;r=await smp.json(PROMPT+"\n\nCourse: "+sel+"\n\nREPORT:\n"+t.slice(0,6000))}catch(e){r=basic(t);mode="basic"}
+  const cr=clean(r);msg.textContent="Check what I read, then save.";
+  const ok=await reviewStep(cr,mode);
+  if(!ok){$("go").disabled=false;msg.textContent="Cancelled. Nothing was saved.";return}
+  const o={course:sel,week,ts:new Date().toISOString(),sid:uid(),semester:$("sem").value.trim()||"Unspecified",...ok};
+  
+  try{if(backend==="db")await col.add(o);else{o.id=String(Date.now());reps.push(o);lsWrite()}}
+  catch(e){msg.textContent="Could not save. Please try again.";$("go").disabled=false;return}
+  $("rep").value="";$("go").disabled=false;
+  msg.textContent=(mode==="ai"?"Done. Your analytics are updated below.":"Saved using a simple count, because the smart reading wasn’t available.");
+  render();setTimeout(syncBoard,1500);$("an").scrollIntoView({behavior:"smooth"});
+});
+let LR=null,revCol=null,setCol=null,projCol=null,REV={},PROF={name:"Student",avatar:{kind:"default"},desc:"",descTs:""},PROJ=[];
+function libLoad(){LR=reps.map(r=>({semester:r.semester||"Unspecified",course_code:r.course,week_start:r.week,quiz:(r.counts||{}).quiz||0,audio:(r.counts||{}).audio||0,video:(r.counts||{}).video||0,flash:(r.counts||{}).flash||0,other:(r.counts||{}).other||0,scores:r.scores||[],topics:r.topics||[],weak:r.weak||[],summary:r.summary||""}));libRender();revRender()}
+function libRender(){
+  const rows=LR||[],sems=[...new Set(rows.map(r=>r.semester))],ss=$("ls"),cur=ss.value;
+  ss.innerHTML=sems.length?sems.map(s=>`<option>${esc(s)}</option>`).join(""):"<option>No records yet</option>";if(sems.includes(cur))ss.value=cur;
+  const b=$("lb");if(!rows.length){b.innerHTML='<p class="meta">Nothing in your library yet. Submit a weekly report and it will appear here.</p>';return}
+  const S=rows.filter(r=>r.semester===ss.value),sum=(l,k)=>l.reduce((a,r)=>a+(r[k]||0),0),pc=l=>{const s=l.flatMap(r=>r.scores||[]).filter(x=>x.out>0);return s.length?Math.round(s.reduce((a,x)=>a+x.got/x.out*100,0)/s.length):null};
+  const mk=(code,l)=>{const c={};TYPES.forEach(([k])=>c[k]=sum(l,k));return{code,n:l.length,c,t:Object.values(c).reduce((a,x)=>a+x,0),pct:pc(l),weak:[...new Set(l.flatMap(r=>r.weak||[]))].slice(0,4)}};
+  const per=COURSES.map(([code])=>mk(code,S.filter(r=>r.course_code===code)));
+  const ws=[...new Set(S.map(r=>r.week_start))].sort(),wk=ws.map(w=>mk(lab(w),S.filter(r=>r.week_start===w)));
+  const tot={};TYPES.forEach(([k])=>tot[k]=sum(S,k));const all=Object.values(tot).reduce((a,x)=>a+x,0),av=pc(S);
+  b.innerHTML=`<div class="top"><div class="big"><b>${ws.length}</b><span class="meta">weeks recorded</span></div><div class="big"><b>${S.length}</b><span class="meta">reports</span></div><div class="big"><b>${all}</b><span class="meta">things done</span></div><div class="big"><b>${av===null?"-":av+"%"}</b><span class="meta">average quiz score</span></div></div>
+  <div class="card"><div class="charts"><div><div class="meta">${CHART==="line"?"Activity by week":"Activities per course"}</div>${bars(per,"l")}</div><div><div class="meta">What you did</div>${donut(tot)}</div></div>
+  <div class="legend">${TYPES.map(([k,n,cl])=>`<span><i class="dot" style="background:${cl}"></i>${n}</span>`).join("")}</div></div>
+  <div class="card"><div class="meta">Activities per week</div>${bars(wk)}</div>
+  <div class="card wrap"><table><tr><th>Course</th><th>Reports</th>${TYPES.map(t=>`<th>${t[1]}</th>`).join("")}<th>Avg quiz</th><th>Struggled with</th></tr>
+  ${per.map(r=>`<tr><td>${r.code}</td><td>${r.n}</td>${TYPES.map(t=>`<td>${r.c[t[0]]}</td>`).join("")}<td>${r.pct===null?"-":r.pct+"%"}</td><td>${r.weak.length?esc(r.weak.join(", ")):"-"}</td></tr>`).join("")}</table></div>`}
+function hkey(s){let h=5381;for(const ch of s)h=((h<<5)+h+ch.charCodeAt(0))>>>0;return"t"+h.toString(36)}
+async function revToggle(k){const on=!REV[k];if(on)REV[k]=1;else delete REV[k];
+  if(backend==="db"&&revCol){try{await revCol.doc(k).set({done:on,ts:new Date().toISOString()})}catch(e){}}
+  else{try{localStorage.setItem("nst-rev",JSON.stringify(REV))}catch(e){}}
+  revRender()}
+function revRender(){if(!LR)return;
+  const ss=$("rs"),cur=ss.value,sems=[...new Set(LR.map(r=>r.semester))];
+  ss.innerHTML=sems.map(s=>`<option>${esc(s)}</option>`).join("");if(sems.includes(cur))ss.value=cur;
+  const cs=$("rc"),cc=cs.value;cs.innerHTML='<option value="">All courses</option>'+COURSES.map(c=>`<option>${c[0]}</option>`).join("");cs.value=cc;
+  const m=new Map();
+  LR.filter(r=>r.semester===ss.value&&(!cs.value||r.course_code===cs.value)).forEach(r=>(r.weak||[]).forEach(t=>{t=String(t).trim();if(!t)return;
+    const k=hkey(r.semester+"|"+r.course_code+"|"+t.toLowerCase()),o=m.get(k)||{k,t,course:r.course_code,weeks:new Set(),last:""};
+    o.weeks.add(r.week_start);if(r.week_start>o.last)o.last=r.week_start;m.set(k,o)}));
+  const L=[...m.values()].sort((a,b)=>(!!REV[a.k])-(!!REV[b.k])||b.weeks.size-a.weeks.size||b.last.localeCompare(a.last)),open=L.filter(x=>!REV[x.k]).length;
+  $("rv").innerHTML=L.length?`<p class="meta">${open} to revise, ${L.length-open} done</p>`+L.map(x=>`<label class="row" style="cursor:pointer;align-items:center"><input type="checkbox" data-rv="${x.k}" ${REV[x.k]?"checked":""} style="width:20px;height:20px"><div style="flex:1;${REV[x.k]?"opacity:.55;text-decoration:line-through":""}"><b>${esc(x.t)}</b><div class="meta">${x.course} · came up in ${x.weeks.size} week${x.weeks.size>1?"s":""} · last seen ${lab(x.last)}</div></div></label>`).join("")
+   :`<p class="meta">No struggled-with topics for this selection yet. They appear when your weekly reports mention topics you found hard.</p>`}
+document.addEventListener("change",e=>{const k=e.target.dataset&&e.target.dataset.rv;if(k)revToggle(k)});
+$("rs").addEventListener("change",revRender);$("rc").addEventListener("change",revRender);$("rr").addEventListener("click",libLoad);
+function csvCell(v){v=v==null?"":String(v);if(/^[=+\-@]/.test(v))v="'"+v;return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+$("dlb").addEventListener("click",async()=>{const m=$("dlm"),ss=$("ls").value;
+  if(!LR||!LR.length){m.textContent="Nothing to download yet. Wait for the library to load first.";return}
+  const S=LR.filter(r=>r.semester===ss);
+  const lines=[["Semester","Course","Week starting","Quizzes","Audio","Video","Flashcards","Other","Quiz scores","Topics","Struggled with","Summary"].join(",")].concat(S.map(r=>[r.semester,r.course_code,r.week_start,r.quiz,r.audio,r.video,r.flash,r.other,(r.scores||[]).map(s=>s.got+"/"+s.out).join("; "),(r.topics||[]).join("; "),(r.weak||[]).join("; "),r.summary].map(csvCell).join(",")));
+  const fname=(ss.replace(/[^\w\- ]+/g,"").trim()||"semester")+" - study records.csv",fdata="\ufeff"+lines.join("\r\n");
+  try{if(typeof claude==="undefined"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([fdata],{type:"text/csv;charset=utf-8"}));a.download=fname;document.body.appendChild(a);a.click();a.remove();m.textContent="Your file was downloaded.";return}
+    const dl=await claude.use("downloads");if(!dl){m.textContent="Downloads aren’t available in this view.";return}
+    await dl.save({filename:(ss.replace(/[^\w\- ]+/g,"").trim()||"semester")+" - study records.csv",data:"\ufeff"+lines.join("\r\n")});
+    m.textContent="Ready. Accept the save prompt to keep the file."}
+  catch(e){m.textContent=e&&e.code==="declined"?"Download cancelled.":"Couldn’t save the file ("+((e&&e.code)||"unknown")+")."}});
+$("ls").addEventListener("change",libRender);
+$("lr").addEventListener("click",libLoad);
+$("nav").addEventListener("click",e=>{const bt=e.target.closest("[data-v]"),v=bt&&bt.dataset.v;if(!v)return;
+  $("v-home").hidden=v!=="home";$("v-week").hidden=v!=="week";$("v-lib").hidden=v!=="lib";$("v-rev").hidden=v!=="rev";$("v-cu").hidden=v!=="cu";$("v-pf").hidden=v!=="pf";$("v-pj").hidden=v!=="pj";$("v-cm").hidden=v!=="cm";
+  document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));
+  if(v==="lib"||v==="rev")libLoad();if(v==="pf")profRender();if(v==="pj")pjRender();if(v==="cm")cmRender();window.scrollTo(0,0);revealText()});
+function applyTheme(v){const d=document.documentElement;if(v&&v!=="auto")d.dataset.theme=v;else delete d.dataset.theme;try{localStorage.setItem("nst-theme",v||"auto")}catch(e){}}
+try{const tv=localStorage.getItem("nst-theme");if(tv){applyTheme(tv);$("th").value=tv}}catch(e){}
+$("th").addEventListener("change",()=>applyTheme($("th").value));
+document.querySelectorAll("[data-cs]").forEach(s=>s.innerHTML=chartOpts());
+document.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.cs!==undefined)setChart(e.target.value)});
+let BG={img:null,dim:30,pan:85};
+function bgSave(){try{localStorage.setItem("nst-bg",JSON.stringify(BG));return true}catch(e){return false}}
+function bgApply(){const b=document.body.style;document.body.classList.toggle("hasbg",!!BG.img);document.documentElement.style.setProperty("--pa",BG.pan+"%");
+  if(BG.img){const d=BG.dim/100;b.backgroundImage=`linear-gradient(rgba(0,0,0,${d}),rgba(0,0,0,${d})),url("${BG.img}")`;b.backgroundSize="cover";b.backgroundPosition="center";b.backgroundRepeat="no-repeat"}
+  else{b.backgroundImage="";b.backgroundSize="";b.backgroundPosition="";b.backgroundRepeat=""}}
+try{const o=JSON.parse(localStorage.getItem("nst-bg")||"null");if(o)BG={...BG,...o}}catch(e){}
+$("bgd").value=BG.dim;$("bgp").value=BG.pan;bgApply();
+$("bgd").addEventListener("input",()=>{BG.dim=+$("bgd").value;bgApply();bgSave()});
+$("bgp").addEventListener("input",()=>{BG.pan=+$("bgp").value;bgApply();bgSave()});
+$("bgx").addEventListener("click",()=>{BG.img=null;bgApply();try{localStorage.removeItem("nst-bg")}catch(e){}$("bgm").textContent="Image removed."});
+$("bgf").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const m=$("bgm");m.textContent="Preparing your image…";
+  const fr=new FileReader();fr.onerror=()=>{m.textContent="Couldn’t read that file."};
+  fr.onload=()=>{const im=new Image();im.onerror=()=>{m.textContent="That doesn’t look like an image I can use."};
+    im.onload=()=>{const sc=Math.min(1,1400/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);
+      c.getContext("2d").drawImage(im,0,0,c.width,c.height);BG.img=c.toDataURL("image/jpeg",.75);bgApply();
+      m.textContent=bgSave()?"Background set. Use the sliders to adjust it.":"Background set for now, but it was too big to remember. Try a smaller photo."};
+    im.src=fr.result};
+  fr.readAsDataURL(f)});
+function reviewStep(c,mode){return new Promise(res=>{const pv=$("pv");pv.hidden=false;
+  pv.innerHTML=`<h2 style="font-size:1rem">Check, then save to see your graphs</h2><p class="meta">${mode==="ai"?"Here is what I read from your report. Fix anything that is wrong.":"I used a simple count because the smart reading wasn’t available. Please check it carefully."}</p>
+  <div class="pvg">${TYPES.map(([k,n])=>`<label class="meta">${n}<input type="number" min="0" id="pv-${k}" value="${c.counts[k]}"></label>`).join("")}</div>
+  <label class="meta">Quiz scores (like 7/10, 8/10)</label><input type="text" id="pv-sc" value="${esc(c.scores.map(s=>s.got+"/"+s.out).join(", "))}">
+  <label class="meta">Topics covered (one per line)</label><textarea id="pv-tp" rows="3">${esc(c.topics.join("\n"))}</textarea>
+  <label class="meta">Topics you struggled with (one per line)</label><textarea id="pv-wk" rows="3">${esc(c.weak.join("\n"))}</textarea>
+  <label class="meta">Short summary</label><input type="text" id="pv-sm" value="${esc(c.summary)}">
+  <p><button class="primary" id="pv-ok" type="button">Save and show my graphs</button> <button class="link" id="pv-no" type="button">Cancel</button></p>`;
+  pv.scrollIntoView({behavior:"smooth"});
+  const done=v=>{pv.hidden=true;pv.innerHTML="";res(v)};
+  $("pv-no").onclick=()=>done(null);
+  $("pv-ok").onclick=()=>{const g=id=>$(id).value,lines=id=>g(id).split("\n").map(s=>s.trim()).filter(Boolean).slice(0,12),counts={};
+    TYPES.forEach(([k])=>counts[k]=Math.max(0,Math.round(+g("pv-"+k)||0)));
+    const scores=[...g("pv-sc").matchAll(/(\d+)\s*\/\s*(\d+)/g)].map(m=>({got:+m[1],out:+m[2]})).filter(s=>s.out>0&&s.got<=s.out);
+    done({counts,scores,topics:lines("pv-tp"),weak:lines("pv-wk"),summary:g("pv-sm").trim().slice(0,200)})}})}
+function applyCourses(l){COURSES=l;if($("cl"))$("cl").value=l.map(c=>c[0]+" - "+c[1]).join("\n");
+  if(sel&&!COURSES.some(c=>c[0]===sel)){sel=null;$("sub").hidden=true}render();if(LR){libRender();revRender()}}
+$("cs-save").addEventListener("click",async()=>{const m=$("cm2"),seen=new Set(),l=[];
+  for(const ln of $("cl").value.split("\n")){const t=ln.trim();if(!t)continue;const x=t.match(/^(.+?)\s+-\s+(.+)$/),c=(x?x[1]:t).trim().slice(0,24),n=(x?x[2]:t).trim().slice(0,80);if(seen.has(c))continue;seen.add(c);l.push([c,n])}
+  if(!l.length){m.textContent="Add at least one course.";return}
+  if(l.length>12){m.textContent="Up to 12 courses, please.";return}
+  applyCourses(l);
+  if(backend==="db"&&setCol){try{await setCol.doc("courses").set({list:l,ts:new Date().toISOString()})}catch(e){}}else{try{localStorage.setItem("nst-courses",JSON.stringify(l))}catch(e){}}
+  m.textContent="Courses saved."});
+$("cl").value=COURSES.map(c=>c[0]+" - "+c[1]).join("\n");
+/*CM-START*/
+let BOARD=[],boardCol=null,ME=null,CANW=null,CMPER="week";
+function boardInit(db,u){try{boardCol=db.collection("board");boardCol.onSnapshot(s=>{BOARD=s.docs.map(d=>({id:d.id,...d.data()}));cmRender()},()=>{});u.isOwner().then(o=>{$("cminv").hidden=!o}).catch(()=>{})}catch(e){}}
+function ago2(t){if(!t)return"-";const d=Math.floor((Date.now()-new Date(t))/864e5);return d<=0?"today":d===1?"yesterday":d+" days ago"}
+function miniAva(a){a=a||{};return a.kind==="preset"?toonSVG(a.i):DEFAULT_AVA}
+function boardStats(b,per){const from=per==="week"?weeks[0]:iso(new Date(Date.now()-29*864e5)),days=(b.days||[]).filter(d=>d>=from).length,wk=b.weeks||{},rep=per==="week"?(wk[weeks[0]]||0):weeks.slice(0,5).reduce((a,w)=>a+(wk[w]||0),0);return{days,rep,pts:days*10+rep*15}}
+function cmRender(){if(!$("cmlist"))return;const joined=BOARD.some(b=>b.id===ME);
+  $("cmjoin").textContent=joined?"Leave the community board":"Join the community board";
+  $("cmstat").textContent=!ME?"Sign in to Claude to join the board.":CANW===false?"You have view-only access, so you can look at the board but not join. Ask the owner to make you a member (Contributor).":joined?"You are on the board. Your numbers update when you open the app or save a report.":"You are not on the board. "+BOARD.length+" member"+(BOARD.length===1?"":"s")+" so far.";
+  $("cmjoin").disabled=!ME||CANW===false;
+  const rows=BOARD.map(b=>({b,s:boardStats(b,CMPER)})).sort((x,y)=>y.s.pts-x.s.pts||(y.b.last||"").localeCompare(x.b.last||""));
+  const medal=["🥇","🥈","🥉"];
+  $("cmlist").innerHTML=rows.length?rows.map((r,i)=>`<tr class="${r.b.id===ME?"me":""}"><td>${medal[i]||i+1}</td><td><span class="mini">${miniAva(r.b.avatar)}</span>${esc(String(r.b.name||"Student").slice(0,30))}${r.b.id===ME?" (you)":""}</td><td>${r.s.days}</td><td>${r.s.rep}</td><td>${+r.b.streak||0}</td><td>${ago2(r.b.last)}</td><td><b>${r.s.pts}</b></td></tr>`).join(""):'<tr><td colspan="7" class="meta" style="text-align:center">Nobody has joined yet.</td></tr>'}
+async function syncBoard(force){if(!boardCol||!ME||CANW===false)return;const joined=BOARD.some(b=>b.id===ME);if(!joined&&!force)return;
+  const mine=BOARD.find(b=>b.id===ME)||{},today=iso(new Date()),days=[...new Set([...(mine.days||[]),today])].sort().slice(-30),wk={};
+  weeks.forEach(w=>{wk[w]=reps.filter(r=>r.week===w).length});
+  const st=profStats(),a=PROF.avatar||{},av=a.kind==="preset"?{kind:"preset",i:+a.i||0}:{kind:"default"};
+  try{await boardCol.doc(ME).set({name:String(PROF.name||"Student").slice(0,30),avatar:av,days,weeks:wk,streak:st.streak,last:new Date().toISOString(),ts:new Date().toISOString()})}catch(e){}}
+$("cmjoin").addEventListener("click",async()=>{const m=$("cmm");
+  if(!boardCol||!ME){m.textContent="Sign in to Claude to join.";return}
+  if(CANW===false){m.textContent="You have view-only access. Ask the owner to make you a member (Contributor).";return}
+  const joined=BOARD.some(b=>b.id===ME);m.textContent="Working…";
+  try{if(joined){await boardCol.doc(ME).delete();m.textContent="You left the board. Your numbers were removed."}else{await syncBoard(true);m.textContent="You joined the board."}}
+  catch(e){m.textContent="Couldn’t update the board. Please try again."}});
+$("cmseg").addEventListener("click",e=>{const b=e.target.closest("[data-per]");if(!b)return;CMPER=b.dataset.per;document.querySelectorAll("#cmseg button").forEach(x=>x.classList.toggle("on",x===b));cmRender()});
+setTimeout(()=>syncBoard(),4000);
+/*CM-END*/
+/*PF-START*/
+const PRESETS=[{s:"#f6d3b3",h:"#2b2118",b:"#bfdbfe",t:"#4f46e5",st:0,g:0},{s:"#e9b98f",h:"#5a3825",b:"#fde68a",t:"#0ea5a4",st:1,g:0},{s:"#c98e5f",h:"#1b1b1b",b:"#bbf7d0",t:"#d29922",st:2,g:1},{s:"#9b6a43",h:"#1b1b1b",b:"#fecdd3",t:"#1f6feb",st:0,g:1},{s:"#6f4a2f",h:"#1b1b1b",b:"#ddd6fe",t:"#e5534b",st:2,g:0},{s:"#f0c7a0",h:"#a0522d",b:"#fed7aa",t:"#2da44e",st:1,g:1},{s:"#e9b98f",h:"#e0b04a",b:"#bfdbfe",t:"#8957e5",st:0,g:0},{s:"#8d5a3b",h:"#2b2118",b:"#fde68a",t:"#db61a2",st:1,g:0}];
+function toonSVG(i){const p=PRESETS[((+i||0)%PRESETS.length+PRESETS.length)%PRESETS.length];
+  const back=p.st===1?`<path d="M26 74 L28 44 C28 16 72 16 72 44 L74 74Z" fill="${p.h}"/>`:"";
+  const face=`<rect x="43" y="58" width="14" height="16" fill="${p.s}"/><ellipse cx="50" cy="45" rx="19" ry="22" fill="${p.s}"/>`;
+  const top=p.st===0?`<path d="M30 42 C29 18 71 18 70 42 C62 31 38 31 30 42Z" fill="${p.h}"/>`:p.st===1?`<path d="M30 42 C32 22 68 22 70 42 C60 32 40 32 30 42Z" fill="${p.h}"/>`:`<g fill="${p.h}"><circle cx="35" cy="29" r="9"/><circle cx="50" cy="24" r="10"/><circle cx="65" cy="29" r="9"/><circle cx="30" cy="40" r="6"/><circle cx="70" cy="40" r="6"/></g>`;
+  const eyes=`<circle cx="43" cy="46" r="2.3" fill="#2a2a2a"/><circle cx="57" cy="46" r="2.3" fill="#2a2a2a"/>`;
+  const gl=p.g?`<g fill="none" stroke="#2a2a2a" stroke-width="1.6"><circle cx="43" cy="46" r="6.5"/><circle cx="57" cy="46" r="6.5"/><path d="M49.5 46h1"/></g>`:"";
+  const mouth=`<path d="M43 55 Q50 61 57 55" fill="none" stroke="#7a3b2e" stroke-width="2" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill="${p.b}"/><path d="M14 100 C14 74 86 74 86 100Z" fill="${p.t}"/>${back}${face}${top}${eyes}${gl}${mouth}</svg>`}
+const DEFAULT_AVA='<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="var(--line)"/><circle cx="50" cy="38" r="18" fill="var(--muted)"/><path d="M14 100 C14 66 86 66 86 100Z" fill="var(--muted)"/></svg>';
+function avatarHTML(){const a=PROF.avatar||{};if(a.kind==="img"&&typeof a.img==="string"&&a.img.indexOf("data:image/")===0)return `<img src="${a.img.replace(/"/g,"")}" alt="Your avatar">`;if(a.kind==="preset")return toonSVG(a.i);return DEFAULT_AVA}
+function squareCrop(img,size){const c=document.createElement("canvas");c.width=c.height=size;const s=Math.min(img.width,img.height);c.getContext("2d").drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,size,size);return c}
+function toonify(c){const n=c.width,x=c.getContext("2d"),id=x.getImageData(0,0,n,n);let src=new Uint8ClampedArray(id.data);
+  for(let pass=0;pass<2;pass++){const out=new Uint8ClampedArray(src);for(let y=1;y<n-1;y++)for(let xx=1;xx<n-1;xx++)for(let ch=0;ch<3;ch++){let s=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)s+=src[((y+dy)*n+xx+dx)*4+ch];out[(y*n+xx)*4+ch]=s/9}src=out}
+  const g=new Float32Array(n*n);for(let i=0;i<n*n;i++)g[i]=.3*src[i*4]+.59*src[i*4+1]+.11*src[i*4+2];
+  const res=new Uint8ClampedArray(src.length);
+  for(let y=0;y<n;y++)for(let xx=0;xx<n;xx++){const i=y*n+xx;let e=0;
+    if(y>0&&xx>0&&y<n-1&&xx<n-1){const gx=-g[i-n-1]-2*g[i-1]-g[i+n-1]+g[i-n+1]+2*g[i+1]+g[i+n+1],gy=-g[i-n-1]-2*g[i-n]-g[i-n+1]+g[i+n-1]+2*g[i+n]+g[i+n+1];e=Math.hypot(gx,gy)}
+    for(let ch=0;ch<3;ch++){let v=Math.round(src[i*4+ch]/51)*51;v=Math.min(255,v*1.08);res[i*4+ch]=e>140?25:v}res[i*4+3]=255}
+  id.data.set(res);x.putImageData(id,0,0);return c}
+function bestStreak(){const ws=[...new Set(reps.map(r=>r.week))].sort();let best=0,run=0,prev=null;ws.forEach(w=>{const d=new Date(w+"T00:00").getTime();run=prev!==null&&Math.round((d-prev)/6048e5)===1?run+1:1;prev=d;if(run>best)best=run});return best}
+function profStats(){
+  const ws8=weeks.slice(),ws4=weeks.slice(0,4),R=reps,has=w=>R.some(r=>r.week===w),inW=(r,ws)=>ws.indexOf(r.week)>=0;
+  const weeksActive=ws8.filter(has).length;
+  let streak=0;for(let i=has(weeks[0])?0:1;i<weeks.length;i++){if(has(weeks[i]))streak++;else break}
+  const cov=new Set(R.filter(r=>inW(r,ws4)).map(r=>r.course)).size;
+  const sc=R.filter(r=>inW(r,ws8)).flatMap(r=>r.scores||[]).filter(s=>s.out>0);
+  const quizAvg=sc.length?sc.reduce((a,s)=>a+s.got/s.out*100,0)/sc.length:null;
+  const act4=R.filter(r=>inW(r,ws4)).reduce((a,r)=>a+TYPES.reduce((b,t)=>b+((r.counts||{})[t[0]]||0),0),0);
+  const tops=new Set();R.forEach(r=>(r.weak||[]).forEach(t=>{t=String(t).trim();if(t)tops.add(hkey((r.semester||"Unspecified")+"|"+r.course+"|"+t.toLowerCase()))}));
+  const nTop=tops.size,nRev=[...tops].filter(k=>REV[k]).length;
+  const ph8=PROJ.filter(p=>ws8.indexOf(monday(new Date(p.ts)))>=0).reduce((a,p)=>a+(+p.hours||0),0),phAll=PROJ.reduce((a,p)=>a+(+p.hours||0),0);
+  const c=x=>Math.max(0,Math.min(99,Math.round(x)));
+  const attrs=[
+    {label:"Consistency",v:c(weeksActive/8*99),tip:weeksActive+" of the last 8 weeks have a report"},
+    {label:"Coverage",v:COURSES.length?c(cov/COURSES.length*99):0,tip:cov+" of "+COURSES.length+" courses reported in the last 4 weeks"},
+    {label:"Quiz form",v:quizAvg===null?null:c(quizAvg),tip:quizAvg===null?"No quiz scores yet":Math.round(quizAvg)+"% average over "+sc.length+" quiz scores"},
+    {label:"Practice",v:c(act4/40*99),tip:act4+" things done in the last 4 weeks"},
+    {label:"Revision",v:nTop?c(nRev/nTop*99):null,tip:nTop?nRev+" of "+nTop+" struggled-with topics revised":"No struggled-with topics yet"},
+    {label:"Initiative",v:PROJ.length?c(ph8/10*99):null,tip:PROJ.length?ph8.toFixed(1)+" project hours in the last 8 weeks":"Optional: log a personal project session"}];
+  const hv=attrs.filter(a=>a.v!==null),ovr=hv.length?Math.round(hv.reduce((a,x)=>a+x.v,0)/hv.length):0;
+  const enough=weeksActive>=2,level=!enough?"New profile (needs reports in 2 weeks)":ovr>=90?"Outstanding":ovr>=75?"Very strong":ovr>=60?"Strong":ovr>=45?"Steady":ovr>=25?"Building habits":"Just starting";
+  const allSc=R.flatMap(r=>r.scores||[]).filter(s=>s.out>0),allAvg=allSc.length?allSc.reduce((a,s)=>a+s.got/s.out*100,0)/allSc.length:0;
+  const byW={};R.forEach(r=>{(byW[r.week]=byW[r.week]||new Set()).add(r.course)});
+  const full=Object.values(byW).some(s=>COURSES.length&&COURSES.every(cc=>s.has(cc[0])));
+  return{attrs,ovr,have:hv.length>0,level,enough,weeksActive,streak,reports:R.length,nRev,nTop,phAll,full,allSc:allSc.length,allAvg,best:bestStreak()}}
+const ACH=[
+  {i:"📝",t:"First report",d:"Save your first weekly report",ok:S=>S.reports>=1},
+  {i:"🔥",t:"Three-week streak",d:"Report 3 weeks in a row",ok:S=>S.best>=3},
+  {i:"🏠",t:"Full house",d:"Report every course in one week",ok:S=>S.full},
+  {i:"🎯",t:"Quiz sharp",d:"Average 70% or more over 3+ quiz scores",ok:S=>S.allSc>=3&&S.allAvg>=70},
+  {i:"✅",t:"Topic tamer",d:"Revise 10 struggled-with topics",ok:S=>S.nRev>=10},
+  {i:"🛠",t:"Maker",d:"Log a personal project session",ok:S=>PROJ.length>=1},
+  {i:"⏱",t:"Deep work",d:"Log 10 project hours",ok:S=>S.phAll>=10},
+  {i:"📚",t:"Dedicated",d:"Save 20 reports",ok:S=>S.reports>=20}];
+function pfRadar(attrs){const cx=150,cy=135,R=95,n=attrs.length,P=(i,f)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+R*f*Math.cos(a),cy+R*f*Math.sin(a)]};
+  let s='<svg viewBox="0 0 300 270" width="100%" style="max-width:320px" role="img" aria-label="Profile ratings">';
+  [.33,.66,1].forEach(f=>s+=`<polygon points="${attrs.map((_,i)=>P(i,f).join(",")).join(" ")}" fill="none" stroke="currentColor" opacity=".18"/>`);
+  attrs.forEach((a,i)=>{const e=P(i,1),l=P(i,1.2);s+=`<line x1="${cx}" y1="${cy}" x2="${e[0]}" y2="${e[1]}" stroke="currentColor" opacity=".18"/><text x="${l[0]}" y="${l[1]+3}" text-anchor="middle" font-size="10" fill="currentColor" opacity="${a.v===null?0.5:1}">${a.label}</text>`});
+  s+=`<polygon points="${attrs.map((a,i)=>P(i,(a.v||0)/99).join(",")).join(" ")}" fill="var(--accent)" fill-opacity=".28" stroke="var(--accent)" stroke-width="2"/>`;
+  attrs.forEach((a,i)=>{if(a.v!==null){const p=P(i,a.v/99);s+=`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--accent)"/>`}});
+  return s+"</svg>"}
+let PEND=null,PJARM=null;
+function profRender(){if(!$("pcard"))return;const S=profStats();
+  $("pcard").innerHTML=`<div class="pc-top"><div class="pc-ava">${avatarHTML()}</div><div><div class="pc-name">${esc(PROF.name||"Student")}</div><div class="meta">${esc(S.level)}</div><div class="pc-ovr"><b>${S.enough&&S.have?S.ovr:"-"}</b><span>OVR</span></div></div></div>
+  <div class="pc-body"><div>${pfRadar(S.attrs)}</div><div>${S.attrs.map(a=>`<div class="ar"><span class="l">${a.label}</span><div class="bar"><i style="width:${a.v===null?0:a.v}%"></i></div><b>${a.v===null?"-":a.v}</b></div><div class="artip">${esc(a.tip)}</div>`).join("")}</div></div>`;
+  $("pdesc").textContent=(PROF.desc||"No summary yet. Press the button for a short, honest summary of your numbers.")+(PROF.descTs?"  (Written "+new Date(PROF.descTs).toLocaleDateString()+")":"");
+  const done=ACH.filter(a=>a.ok(S)).length;$("pacn").textContent="("+done+" of "+ACH.length+")";
+  $("pach").innerHTML=ACH.map(a=>`<div class="ach ${a.ok(S)?"on":""}"><span class="ai">${a.i}</span><b>${a.t}</b><div class="meta">${a.d}</div></div>`).join("");
+  pjRender();
+  if(document.activeElement!==$("pname"))$("pname").value=PROF.name||"";
+  const a=PROF.avatar||{};$("pgrid").innerHTML=PRESETS.map((p,i)=>`<button type="button" data-pre="${i}" aria-label="Avatar ${i+1}" class="${a.kind==="preset"&&+a.i===i?"sel":""}">${toonSVG(i)}</button>`).join("")}
+async function profSave(){PROF.ts=new Date().toISOString();const o={name:PROF.name||"Student",avatar:PROF.avatar||{kind:"default"},desc:PROF.desc||"",descTs:PROF.descTs||"",ts:PROF.ts};
+  if(backend==="db"&&setCol){try{await setCol.doc("profile").set(o)}catch(e){}}else{try{localStorage.setItem("nst-profile",JSON.stringify(o))}catch(e){}}setTimeout(syncBoard,800)}
+function plainDesc(S){const hv=S.attrs.filter(a=>a.v!==null).slice().sort((a,b)=>b.v-a.v);
+  if(!S.enough)return"There is not enough data yet for a fair picture. Save reports for at least two different weeks and the ratings will become more reliable.";
+  return"You had a report in "+S.weeksActive+" of the last 8 weeks. Your strongest rating is "+hv[0].label+" ("+hv[0].v+") and your weakest is "+hv[hv.length-1].label+" ("+hv[hv.length-1].v+")."}
+$("pdb").addEventListener("click",async()=>{const m=$("pdm"),S=profStats();$("pdb").disabled=true;m.textContent="Writing…";let txt="";
+  try{smp=smp||await claude.use("sample");if(!smp)throw 0;
+    const data={overall:S.have?S.ovr:null,level:S.level,weeksWithReports:S.weeksActive+" of last 8",currentStreakWeeks:S.streak,totalReports:S.reports,ratings:S.attrs.map(a=>({name:a.label,value:a.v,detail:a.tip}))};
+    const r=await smp.json('You write a short, honest study-profile summary for a student\u2019s app. Use only the numbers given. Write 2 or 3 plain sentences. Do not exaggerate or flatter, do not guess about talent, intelligence or personality, and do not invent facts. Mention one real strength and one thing to improve. If the data is thin (reports in fewer than 3 weeks), say so. Reply with ONLY JSON: {"description":"..."}\n\nDATA:\n'+JSON.stringify(data));
+    txt=String((r&&r.description)||"").trim().slice(0,500)}catch(e){txt=""}
+  if(!txt){txt=plainDesc(S);m.textContent="Done."}else m.textContent="Done.";
+  PROF.desc=txt;PROF.descTs=new Date().toISOString();$("pdb").disabled=false;await profSave();profRender()});
+$("pname").addEventListener("change",()=>{PROF.name=$("pname").value.trim().slice(0,30)||"Student";profSave();profRender()});
+$("pdef").addEventListener("click",()=>{PROF.avatar={kind:"default"};PEND=null;$("pavc").innerHTML="";profSave();profRender()});
+$("pavf").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const m=$("pavm");m.textContent="Preparing…";
+  const fr=new FileReader();fr.onerror=()=>{m.textContent="Couldn’t read that file."};
+  fr.onload=()=>{const im=new Image();im.onerror=()=>{m.textContent="That doesn’t look like an image I can use."};
+    im.onload=()=>{const o=squareCrop(im,192).toDataURL("image/jpeg",.82),t=toonify(squareCrop(im,192)).toDataURL("image/jpeg",.85);PEND={o,t};
+      $("pavc").innerHTML=`<div class="av2"><img src="${o}" alt="Your picture"><button class="primary" type="button" data-pick="o">Use as it is</button></div><div class="av2"><img src="${t}" alt="Cartoon-style version"><button class="primary" type="button" data-pick="t">Use cartoon style</button></div>`;m.textContent="Choose one."};
+    im.src=fr.result};fr.readAsDataURL(f)});
+document.addEventListener("click",async e=>{const t=e.target.closest("[data-pre],[data-pick],[data-pjdel]");if(!t)return;
+  if(t.dataset.pre!==undefined){PROF.avatar={kind:"preset",i:+t.dataset.pre};profSave();profRender();return}
+  if(t.dataset.pick&&PEND){PROF.avatar={kind:"img",img:PEND[t.dataset.pick]};PEND=null;$("pavc").innerHTML="";$("pavm").textContent="Avatar updated.";profSave();profRender();return}
+  const id=t.dataset.pjdel;if(id===undefined)return;
+  if(PJARM!==id){PJARM=id;profRender();setTimeout(()=>{if(PJARM===id){PJARM=null;profRender()}},4000);return}
+  PJARM=null;if(backend==="db"&&projCol){try{await projCol.doc(id).delete()}catch(er){}}else{PROJ=PROJ.filter(p=>p.id!==id);try{localStorage.setItem("nst-proj",JSON.stringify(PROJ))}catch(er){}profRender()}});
+/*PF-END*/
+/*PJ-START*/
+const PJ_PROMPT='You read a student\u2019s report about one personal project session (not coursework). Reply with ONLY JSON, no other text: {"skills":["..."],"learned":["..."],"setbacks":["..."],"improvements":["..."],"growth":"..."}. skills: up to 8 short skill names the student says they used, built or improved. learned: up to 5 short lessons. setbacks: up to 5 short setbacks or problems. improvements: up to 5 short things that got better or were fixed. growth: at most 25 words on how the student says they grew. Use only what the report says. Use empty lists or an empty string when not mentioned. Never guess and never praise.';
+const pjKey=s=>String(s).trim().toLowerCase();
+function pjClean(r){r=r||{};const L=(a,n)=>(Array.isArray(a)?a:[]).filter(x=>x!=null).map(x=>String(x).trim().slice(0,80)).filter(Boolean).slice(0,n);return{skills:L(r.skills,8),learned:L(r.learned,5),setbacks:L(r.setbacks,5),improvements:L(r.improvements,5),growth:String(r.growth||"").trim().slice(0,200)}}
+function pjProjects(){const m=new Map();PROJ.forEach(p=>{const k=pjKey(p.title||"");if(!k)return;const o=m.get(k)||{k,title:String(p.title).trim(),hours:0,n:0,sb:0,im:0};o.hours+=+p.hours||0;o.n++;o.sb+=(p.setbacks||[]).length;o.im+=(p.improvements||[]).length;m.set(k,o)});return[...m.values()]}
+function hcols(vals,labels){const W=420,H=170,L=28,B=24,max=Math.max(1,...vals),bw=(W-L-8)/vals.length;let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Project hours per week">`;
+  [0,.5,1].forEach(f=>{const y=H-B-f*(H-B-14);s+=`<line x1="${L}" x2="${W-4}" y1="${y}" y2="${y}" stroke="currentColor" opacity=".15"/><text x="${L-4}" y="${y+3}" text-anchor="end" font-size="9" fill="currentColor">${(max*f).toFixed(max<4?1:0)}</text>`});
+  vals.forEach((v,i)=>{const h=v/max*(H-B-14),x=L+i*bw+bw*.15;if(h>0)s+=`<rect class="gv" x="${x}" y="${H-B-h}" width="${bw*.7}" height="${h}" rx="3" fill="#1f6feb"/>`;s+=`<text x="${x+bw*.35}" y="${H-8}" text-anchor="middle" font-size="9" fill="currentColor">${esc(labels[i])}</text>`});return s+"</svg>"}
+function hlist(items,color){const max=Math.max(1,...items.map(i=>i.v)),W=420,L=110;let s=`<svg viewBox="0 0 ${W} ${items.length*26+6}" width="100%" role="img" aria-label="Skills mentioned">`;
+  items.forEach((it,i)=>{const y=i*26+3,w=it.v/max*(W-L-30);s+=`<text x="0" y="${y+14}" font-size="11" fill="currentColor">${esc(String(it.k).slice(0,18))}</text><rect class="g" x="${L}" y="${y}" width="${w}" height="16" rx="3" fill="${color}"/><text x="${L+w+6}" y="${y+13}" font-size="11" fill="currentColor">${it.v}</text>`});return s+"</svg>"}
+function pdonut(items){const tot=items.reduce((a,x)=>a+x.v,0);if(!tot)return"";const C=2*Math.PI*52;let off=0,s=`<svg viewBox="0 0 330 ${Math.max(150,items.length*18+16)}" width="100%" role="img" aria-label="Time by project"><g transform="translate(75 75)">`;
+  items.forEach((x,i)=>{const len=x.v/tot*C;s+=`<circle r="52" fill="none" stroke="${PAL[i%PAL.length]}" stroke-width="28" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90)"/>`;off+=len});
+  s+=`<text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="currentColor">${+tot.toFixed(1)}h</text></g>`;
+  items.forEach((x,i)=>{const y=18+i*18;s+=`<rect x="165" y="${y-9}" width="10" height="10" rx="2" fill="${PAL[i%PAL.length]}"/><text x="181" y="${y}" font-size="11" fill="currentColor">${esc(String(x.k).slice(0,20))} (${+x.v.toFixed(1)}h)</text>`});return s+"</svg>"}
+function pairs(items){const max=Math.max(1,...items.flatMap(x=>[x.a,x.b])),W=420,L=110,H=items.length*38+6,sc=v=>v/max*(W-L-30);let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Setbacks and improvements per project">`;
+  items.forEach((x,i)=>{const y=i*38+3;s+=`<text x="0" y="${y+16}" font-size="11" fill="currentColor">${esc(String(x.k).slice(0,18))}</text><rect class="g" x="${L}" y="${y}" width="${sc(x.a)}" height="14" rx="3" fill="#e5534b"/><text x="${L+sc(x.a)+6}" y="${y+11}" font-size="10" fill="currentColor">${x.a}</text><rect class="g" x="${L}" y="${y+17}" width="${sc(x.b)}" height="14" rx="3" fill="#2da44e"/><text x="${L+sc(x.b)+6}" y="${y+28}" font-size="10" fill="currentColor">${x.b}</text>`});return s+"</svg>"}
+function pjRender(){if(!$("pjan"))return;
+  const P=pjProjects();$("pjdl").innerHTML=P.map(p=>`<option value="${esc(p.title)}"></option>`).join("");
+  const cs=$("pjc"),cur=cs.value;cs.innerHTML='<option value="">General</option>'+COURSES.map(c=>`<option>${esc(c[0])}</option>`).join("");cs.value=cur;
+  const fl=$("pjflt"),fc=fl.value;fl.innerHTML='<option value="">All projects</option>'+P.map(p=>`<option value="${esc(p.k)}">${esc(p.title)}</option>`).join("");fl.value=P.some(p=>p.k===fc)?fc:"";
+  const S=PROJ.filter(p=>!fl.value||pjKey(p.title||"")===fl.value);
+  if(!S.length){$("pjan").innerHTML='<p class="meta" style="margin:0">Log your first session and its report. Charts for hours, skills, setbacks, and improvements will appear here. They are separate from your course reports.</p>'}
+  else{const hrs=S.reduce((a,p)=>a+(+p.hours||0),0),sb=S.reduce((a,p)=>a+(p.setbacks||[]).length,0),im=S.reduce((a,p)=>a+(p.improvements||[]).length,0),sk=new Map();
+    S.forEach(p=>(p.skills||[]).forEach(x=>{const k=pjKey(x);if(!k)return;const o=sk.get(k)||{k:x,v:0};o.v++;sk.set(k,o)}));
+    const skills=[...sk.values()].sort((a,b)=>b.v-a.v).slice(0,8),ws=weeks.slice().reverse(),vals=ws.map(w=>S.filter(p=>monday(new Date(p.ts))===w).reduce((a,p)=>a+(+p.hours||0),0));
+    const byP=P.filter(p=>!fl.value||p.k===fl.value).sort((a,b)=>b.hours-a.hours).slice(0,8),growth=S.filter(p=>p.growth).slice().sort((a,b)=>String(b.ts).localeCompare(String(a.ts))).slice(0,4);
+    $("pjan").innerHTML=`<div class="top"><div class="big"><b>${byP.length}</b><span class="meta">projects</span></div><div class="big"><b>${S.length}</b><span class="meta">sessions</span></div><div class="big"><b>${+hrs.toFixed(1)}</b><span class="meta">hours</span></div><div class="big"><b>${sk.size}</b><span class="meta">skills named</span></div><div class="big"><b>${sb} / ${im}</b><span class="meta">setbacks / improvements</span></div></div>
+    <div class="charts"><div><div class="meta">Hours per week</div>${hcols(vals,ws.map(lab))}</div><div><div class="meta">Time by project</div>${pdonut(byP.map(p=>({k:p.title,v:p.hours})))}</div></div>
+    <div class="charts"><div><div class="meta">Skills you mention most</div>${skills.length?hlist(skills,"#8957e5"):'<p class="meta">No skills named yet.</p>'}</div><div><div class="meta"><span style="color:#e5534b">&#9632;</span> setbacks &nbsp; <span style="color:#2da44e">&#9632;</span> improvements, per project</div>${pairs(byP.map(p=>({k:p.title,a:p.sb,b:p.im})))}</div></div>
+    ${growth.length?`<div class="meta" style="margin-top:6px"><b>Growth, in your words</b></div><ul class="lst">${growth.map(p=>`<li>${esc(p.growth)} <span class="meta">(${esc(p.title)}, ${new Date(p.ts).toLocaleDateString()})</span></li>`).join("")}</ul>`:""}`}
+  $("pjlist").innerHTML=PROJ.length?PROJ.slice().sort((a,b)=>String(b.ts).localeCompare(String(a.ts))).slice(0,15).map(p=>{
+    const chips=(p.skills||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join(""),ul=(t,a)=>a&&a.length?`<div class="meta"><b>${t}</b></div><ul class="lst">${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
+    const det=(p.report||p.growth||chips)?`<details style="margin-top:4px"><summary class="meta" style="cursor:pointer">Open report</summary>${p.growth?`<p style="margin:6px 0"><b>Growth:</b> ${esc(p.growth)}</p>`:""}${chips?`<div style="margin:6px 0">${chips}</div>`:""}${ul("Learned",p.learned)}${ul("Setbacks",p.setbacks)}${ul("Improvements",p.improvements)}${p.report?`<div class="meta" style="margin-top:6px;white-space:pre-wrap">${esc(p.report)}</div>`:""}</details>`:"";
+    return `<div class="row"><div style="flex:1"><b>${esc(p.title)}</b> <span class="meta">${p.course?esc(p.course)+" · ":""}${+p.hours||0} h · ${new Date(p.ts).toLocaleDateString()}</span>${p.note&&!p.report?`<div class="meta">${esc(p.note)}</div>`:""}${det}</div><button class="link" data-pjdel="${esc(p.id)}">${PJARM===p.id?"Tap again to confirm":"remove"}</button></div>`}).join(""):'<p class="meta" style="margin:0">No sessions yet.</p>'}
+function pjReview(c,mode){return new Promise(res=>{const pv=$("pjpv");pv.hidden=false;
+  pv.innerHTML=`<h2 style="font-size:1rem;margin:0 0 4px">Check, then save to see your analytics</h2><p class="meta" style="margin:0 0 6px">${mode==="ai"?"Here is what I read from your report. Fix anything that is wrong.":"Automatic reading isn’t part of this version. Fill these in yourself, or leave them empty."}</p>
+  <label class="meta">Skills you used or built (one per line)</label><textarea id="pv-sk" rows="3">${esc(c.skills.join("\n"))}</textarea>
+  <label class="meta">What you learned (one per line)</label><textarea id="pv-le" rows="3">${esc(c.learned.join("\n"))}</textarea>
+  <label class="meta">Setbacks (one per line)</label><textarea id="pv-sb" rows="3">${esc(c.setbacks.join("\n"))}</textarea>
+  <label class="meta">Improvements (one per line)</label><textarea id="pv-im" rows="3">${esc(c.improvements.join("\n"))}</textarea>
+  <label class="meta">How you grew (one short sentence)</label><input type="text" id="pv-gr" value="${esc(c.growth)}">
+  <p><button class="primary" id="pj-ok" type="button">Save session</button> <button class="link" id="pj-no" type="button">Cancel</button></p>`;
+  pv.scrollIntoView({behavior:"smooth"});const done=v=>{pv.hidden=true;pv.innerHTML="";res(v)};
+  $("pj-no").onclick=()=>done(null);
+  $("pj-ok").onclick=()=>{const L=id=>$(id).value.split("\n").map(s=>s.trim().slice(0,80)).filter(Boolean).slice(0,8);done({skills:L("pv-sk"),learned:L("pv-le").slice(0,5),setbacks:L("pv-sb").slice(0,5),improvements:L("pv-im").slice(0,5),growth:$("pv-gr").value.trim().slice(0,200)})}})}
+async function pjSave(proj,h,extra){const o={course:$("pjc").value,title:proj.slice(0,80),hours:Math.round(h*100)/100,note:"",ts:new Date().toISOString(),...extra};
+  if(backend==="db"&&projCol){await projCol.add(o)}else{o.id=String(Date.now());PROJ.unshift(o);try{localStorage.setItem("nst-proj",JSON.stringify(PROJ))}catch(e){}}}
+function pjCheck(){const m=$("pjm"),proj=$("pjt").value.trim(),h=parseFloat($("pjh").value);if(!proj){m.textContent="Name the project.";return null}if(!(h>0)||h>24){m.textContent="Enter hours between 0 and 24.";return null}return{proj,h}}
+function pjReset(){$("pjr").value="";$("pjh").value="";$("pjcount").textContent="0"}
+$("pjr").addEventListener("input",()=>{$("pjcount").textContent=$("pjr").value.length});
+$("pjflt").addEventListener("change",pjRender);
+$("pjread").addEventListener("click",async()=>{const m=$("pjm"),v=pjCheck();if(!v)return;const t=$("pjr").value.trim();
+  if(t.length<40){m.textContent="Write a little more about the session, or choose Save without reading.";return}
+  $("pjread").disabled=true;m.textContent="Reading your report…";let c,mode="ai";
+  try{smp=smp||await claude.use("sample");if(!smp)throw 0;c=pjClean(await smp.json(PJ_PROMPT+"\n\nREPORT:\n"+t.slice(0,8000)))}catch(e){c=pjClean({});mode="basic"}
+  m.textContent="Check what I read, then save.";const ok=await pjReview(c,mode);$("pjread").disabled=false;
+  if(!ok){m.textContent="Cancelled. Nothing was saved.";return}
+  try{await pjSave(v.proj,v.h,{...ok,report:t.slice(0,8000)})}catch(e){m.textContent="Couldn’t save. Please try again.";return}
+  pjReset();m.textContent="Session saved. Your analytics are updated below.";profRender();$("pjan").scrollIntoView({behavior:"smooth"})});
+$("pjquick").addEventListener("click",async()=>{const m=$("pjm"),v=pjCheck();if(!v)return;const t=$("pjr").value.trim();
+  try{await pjSave(v.proj,v.h,t?{report:t.slice(0,8000)}:{})}catch(e){m.textContent="Couldn’t save. Please try again.";return}
+  pjReset();m.textContent="Session saved.";profRender()});
+$("gopj").addEventListener("click",()=>document.querySelector('#nav [data-v="pj"]').click());
+/*PJ-END*/
+function showTour(){$("tour").hidden=false;$("t-go").focus()}
+function revealText(){const v=document.querySelector("main>div:not([hidden])");if(!v)return;let i=0;
+  v.querySelectorAll("h1,h2,.sub,p,li,.meta,label,th").forEach(el=>{if(el.closest("#pv"))return;el.classList.remove("fx");void el.offsetWidth;el.style.animationDelay=Math.min(i,24)*55+"ms";el.classList.add("fx");i++})}
+function hideTour(){$("tour").hidden=true;try{localStorage.setItem("nst-tour","1")}catch(e){}revealText()}
+$("t-skip").addEventListener("click",hideTour);$("t-go").addEventListener("click",hideTour);$("tourbtn").addEventListener("click",showTour);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("tour").hidden)hideTour()});
+const AGREE_V="2026-10-25b";
+function needAgree(){try{return localStorage.getItem("nst-agree")!==AGREE_V}catch(e){return true}}
+$("agk").addEventListener("change",()=>{$("agb").disabled=!$("agk").checked});
+$("agb").addEventListener("click",()=>{try{localStorage.setItem("nst-agree",AGREE_V)}catch(e){}$("agree").hidden=true;try{if(localStorage.getItem("nst-tour")!=="1")showTour()}catch(e){showTour()}});
+if(needAgree())$("agree").hidden=false;else{try{if(localStorage.getItem("nst-tour")!=="1")showTour()}catch(e){showTour()}}
+const LEGAL={privacy:`<h2>Privacy Policy</h2><p class="meta">Mathesis Lite · Version 1.0 · Effective 25 October 2026</p>
+<h3>1. Who we are</h3><p>Mathesis (“the app”) is a personal study-tracking app made by <b>From the Alchemist</b> (Chrisford), based in Kumasi, Ghana. You can reach us at <b>orlandochris500@gmail.com</b>.</p>
+<h3>2. The short version</h3><ul><li>This version has no account, no database, and no AI service. Everything you enter stays in your own browser, on your own device.</li><li>We do not receive, see, sell, or share your information. There are no ads and no tracking tools.</li><li>You can delete everything at any time by clearing this site’s data in your browser.</li></ul>
+<h3>3. What the app keeps on your device</h3><ul><li>Your course list, display name, and chosen avatar (including a picture, if you add one).</li><li>Each weekly report’s result: course, week, semester label, counts, quiz scores, topics, topics you struggled with, and a short summary.</li><li>Your personal project sessions, including the project reports you write.</li><li>Which revision topics you have ticked.</li><li>Your theme, chart style, background image, and whether you have seen the welcome pages.</li></ul>
+<h3>4. How the numbers are made</h3><p>When you paste a weekly report, the app counts words such as “quiz”, “audio”, “video”, and “flashcard”, and any scores such as 7/10, on your device. You check and correct the result before it is saved. The pasted weekly report text is cleared after you save. A project report you write is kept with its session so you can read it again.</p>
+<h3>5. Files you download</h3><p>When you download a semester as a spreadsheet file, it is saved to your device. It is yours. We never receive it.</p>
+<h3>6. Keeping your data</h3><p>Because your data lives in your browser, it can be lost if you clear browser data, change browser or device, or use private browsing. Download your semester file now and then to keep your own copy.</p>
+<h3>7. Children</h3><p>The app is made for students at university or college level. If you are under 18, please use it only with a parent or guardian’s permission.</p>
+<h3>8. Changes</h3><p>We may change this policy when the app changes. The date at the top shows the latest version.</p>
+<h3>9. Contact and complaints</h3><p><b>From the Alchemist</b> (Chrisford), Kumasi, Ghana, orlandochris500@gmail.com. If we cannot settle a concern, you may contact the Data Protection Commission of Ghana.</p>`,terms:`<h2>Terms of Service</h2><p class="meta">Mathesis Lite · Version 1.0 · Effective 25 October 2026</p>
+<h3>1. Agreeing to these terms</h3><p>These terms are between you and <b>From the Alchemist</b> (Chrisford), the developer of the app (“we”). By opening or using Mathesis (“the app”) you agree to them and to the Privacy Policy. If you do not agree, please do not use the app.</p>
+<h3>2. What the app is</h3><p>Mathesis is a free personal study-tracking tool. You paste a weekly report from your study notebooks, the app counts it, you check the result, and the app turns it into charts, a revision list, a profile, and a semester record you can download. It is a study aid. It is not a teaching service, an official academic record, or professional advice.</p>
+<h3>3. Who may use it</h3><p>The app is made for students at university or college level. If you are under 18, use it only with a parent or guardian’s permission.</p>
+<h3>4. Your content</h3><p>What you enter belongs to you and stays on your device. Only enter material you are allowed to use.</p>
+<h3>5. Rules</h3><p>You agree not to use the app to break the law or the rules of your school, college, or university, including its rules on using AI tools; not to copy, sell, or rent the app or pass it off as your own without our written permission; and not to remove or change the “From the Alchemist” signature.</p>
+<h3>6. The numbers can be wrong</h3><p>The app’s counting is simple and can miss or miscount things. That is why you check and edit everything before saving. You are responsible for checking it. Do not rely on the app’s charts, ratings, or lists as the only record or proof of your work. Ratings describe your habits in the app only. They are not grades, certificates, or an assessment of your ability.</p>
+<h3>7. Your records and backups</h3><p>Your data is kept in your browser and can be lost. Download your semester file now and then and keep your own copy.</p>
+<h3>8. Availability and changes</h3><p>The app is free and may change, stop working, or be withdrawn at any time.</p>
+<h3>9. Ownership</h3><p>The app’s design, code, wording, icon, and the “From the Alchemist” signature belong to us. These terms give you a personal, non-transferable permission to use the app.</p>
+<h3>10. No warranties and limit on responsibility</h3><p>To the fullest extent the law allows, the app is provided “as is” and “as available” without promises of accuracy or fitness for a purpose, and we are not responsible for losses that come from using it or not being able to use it, including lost records or wrong counts. Nothing here limits responsibility that cannot be limited by law.</p>
+<h3>11. Changes, law, and contact</h3><p>We may update these terms; the date at the top shows the latest version. These terms are governed by the laws of Ghana. Nothing in them removes rights you have under the laws of the country where you live that cannot be waived. Contact: <b>From the Alchemist</b> (Chrisford), Kumasi, Ghana, orlandochris500@gmail.com.</p>`};
+document.addEventListener("click",e=>{const a=e.target.closest("[data-legal]");if(!a)return;e.preventDefault();$("lglb").innerHTML=LEGAL[a.dataset.legal];$("lglo").hidden=false;$("lglx").focus()});
+$("lglx").addEventListener("click",()=>{$("lglo").hidden=true});
+$("hs").addEventListener("click",()=>document.querySelector('#nav [data-v="week"]').click());
+try{$("skiph").checked=localStorage.getItem("nst-skip-home")==="1"}catch(e){}
+$("skiph").addEventListener("change",()=>{try{localStorage.setItem("nst-skip-home",$("skiph").checked?"1":"0")}catch(e){}});
+try{if(localStorage.getItem("nst-skip-home")!=="1")document.querySelector('#nav [data-v="home"]').click()}catch(e){document.querySelector('#nav [data-v="home"]').click()}
+(()=>{const s=$("sig");s.addEventListener("click",()=>{s.classList.add("lit");setTimeout(()=>s.classList.remove("lit"),2600)})})();
+$("rl").addEventListener("click",()=>location.reload());
+init();
+</script>
+</body>
+</html>
